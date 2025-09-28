@@ -1,0 +1,38 @@
+.footer {
+  background-color: var(--color-main);
+  padding: 2rem 0;
+}
+
+.footer__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.footer__content {
+  text-align: center;
+}
+
+.footer__text {
+  color: var(--color-accent-2);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-body);
+}
+
+.footer__copyright {
+  color: var(--color-accent-2);
+  font-size: 0.75rem;
+  font-family: var(--font-body);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .footer {
+    padding: 1.5rem 0;
+  }
+
+  .footer__container {
+    padding: 0 1rem;
+  }
+}
