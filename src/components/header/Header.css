@@ -50,6 +50,24 @@
   color: var(--color-main);
 }
 
+.header__nav-link--button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+  transition: color 0.2s ease;
+  font-size: 1.3rem;
+}
+
+.header__nav-link--button:hover {
+  color: var(--color-main);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .header__container {

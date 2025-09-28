@@ -68,6 +68,11 @@ function App() {
             <ForgotPasswordPage />
           </PublicLayout>
         } />
+        <Route path="/reset-password" element={
+          <PublicLayout>
+            <ForgotPasswordPage />
+          </PublicLayout>
+        } />
 
         {/* User Routes */}
         <Route path="/profile" element={

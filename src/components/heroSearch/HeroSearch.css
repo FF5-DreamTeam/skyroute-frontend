@@ -123,7 +123,7 @@
   border: 1px solid var(--color-background-2);
   border-radius: 0.75rem;
   background-color: var(--color-background);
-  color: var(--color-text);
+  color: var(--color-accent-2);
   font-size: 1rem;
   transition: all 0.2s ease;
   font-family: var(--font-body);
@@ -133,6 +133,26 @@
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+.hero-search__form-input[type="date"] {
+  color: var(--color-accent-2);
+}
+
+.hero-search__form-input[type="date"]::-webkit-datetime-edit-text {
+  color: var(--color-accent-2);
+  opacity: 0.7;
+}
+
+.hero-search__form-input[type="date"]::-webkit-datetime-edit-month-field,
+.hero-search__form-input[type="date"]::-webkit-datetime-edit-day-field,
+.hero-search__form-input[type="date"]::-webkit-datetime-edit-year-field {
+  color: var(--color-accent-2);
+}
+
+.hero-search__form-input[type="date"]::-webkit-calendar-picker-indicator {
+  color: var(--color-accent-2);
+  opacity: 0.7;
 }
 
 .hero-search__dropdown-container {

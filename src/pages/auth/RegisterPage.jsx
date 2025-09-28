@@ -1,11 +1,145 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { API_ENDPOINTS } from '../../config/api';
+import './AuthPages.css';
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.accessToken) {
+          localStorage.setItem('token', data.accessToken);
+        }
+        if (data.user) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        navigate('/profile');
+      } else {
+        setError(data.message || 'Registration failed');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Register Page</h1>
-        <p className="text-gray-600">This is the register page component.</p>
+    <div className="auth-page">
+      <div className="auth-container">
+        <div className="auth-card">
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-form-group">
+              <label htmlFor="firstName" className="auth-label">
+                First Name:
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="auth-input"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="lastName" className="auth-label">
+                Last Name:
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="auth-input"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="email" className="auth-label">
+                Email:
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="auth-input"
+                required
+              />
+            </div>
+
+            <div className="auth-form-group">
+              <label htmlFor="password" className="auth-label">
+                Password:
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="auth-input"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="auth-error">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="auth-button"
+              disabled={loading}
+            >
+              {loading ? 'REGISTERING...' : 'REGISTER'}
+            </button>
+
+            <div className="auth-links">
+              <p>Already have an account? <Link to="/login" className="auth-link">Login!</Link></p>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
