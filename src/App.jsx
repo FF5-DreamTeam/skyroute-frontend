@@ -85,7 +85,7 @@ function App() {
             <BookingsPage />
           </UserLayout>
         } />
-        <Route path="/booking/:id" element={
+        <Route path="/booking-details/:bookingId" element={
           <UserLayout>
             <BookingDetailsPage />
           </UserLayout>

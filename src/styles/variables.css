@@ -4,7 +4,8 @@
   --color-text: #000000;
   --color-accent-1: #798686;
   --color-accent-2: #5d5d5d;
-  --color-background-2: #d9d9d9;
+  --color-background-2: #f8f9fa;
+  --color-background-3: #e9ecef;
   --color-accent-3: #f7a34f;
   --color-text-2: #2d3748;
 
@@ -14,6 +15,7 @@
   --color-accent-1-dark: #6b7575;
 
   --color-primary: var(--color-main);
+  --color-primary-dark: var(--color-main-dark);
   --color-secondary: var(--color-accent-1);
   --color-success: #10b981;
   --color-warning: var(--color-accent-3);
@@ -39,4 +41,5 @@
 
   --font-display: "Roboto", sans-serif;
   --font-body: "Inter", sans-serif;
+  --font-heading: "Roboto", sans-serif;
 }
