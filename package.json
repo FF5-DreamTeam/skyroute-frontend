@@ -2,7 +2,7 @@
   "name": "skyroute-front",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ff5-dreamteam.github.io/skyroute-frontend/",
+  "homepage": "https://skyroot.space",
   "dependencies": {
     "@mantine/core": "8.3.2",
     "@mantine/dates": "8.3.2",
