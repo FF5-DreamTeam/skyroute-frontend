@@ -210,6 +210,7 @@ const BookingDetailsPage = () => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'CONFIRMED': return 'status-confirmed';
+      case 'CREATED': return 'status-created';
       case 'CANCELLED': return 'status-cancelled';
       case 'COMPLETED': return 'status-completed';
       case 'PENDING': return 'status-pending';
@@ -337,6 +338,10 @@ const BookingDetailsPage = () => {
             <div className="passengers-section">
               <h3 className="section-title">Passengers</h3>
               
+              <div className="booking-price-large">
+                <div className="price-label">Total Price:</div>
+                <div className="price-value">€{booking.totalPrice?.toFixed(2) || '0.00'}</div>
+              </div>
               
               <div className="passengers-list-large">
                 {booking.passengerNames.map((name, index) => (
@@ -399,7 +404,7 @@ const BookingDetailsPage = () => {
             </div>
 
             <div className="booking-actions-large">
-              {booking.bookingStatus === 'CONFIRMED' && (
+              {(booking.bookingStatus === 'CONFIRMED' || booking.bookingStatus === 'CREATED') && (
                 <button 
                   onClick={openCancelModal}
                   disabled={loading}
