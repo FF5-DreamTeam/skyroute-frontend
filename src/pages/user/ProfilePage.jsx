@@ -23,6 +23,14 @@ const ProfilePage = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
 
+  const isProfileComplete = () => {
+    const requiredFields = ['firstName', 'lastName', 'email', 'birthDate', 'phoneNumber'];
+    return requiredFields.every(field => {
+      const value = formData[field];
+      return value && value.trim() !== '';
+    });
+  };
+
   useEffect(() => {
     const userData = localStorage.getItem('user');
     const token = localStorage.getItem('token');
@@ -168,6 +176,16 @@ const ProfilePage = () => {
               </button>
             )}
           </div>
+
+          {!isProfileComplete() && (
+            <div className="profile-warning">
+              <div className="profile-warning-icon">⚠️</div>
+              <div className="profile-warning-text">
+                <strong>Profile Update Required</strong>
+                <p>Please complete all required fields to enable flight booking functionality. All fields except photo are mandatory.</p>
+              </div>
+            </div>
+          )}
 
           <div className="profile-content">
             <div className="profile-image-section">

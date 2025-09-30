@@ -64,13 +64,16 @@ export const API_ENDPOINTS = {
   FLIGHTS: {
     // Admin endpoints
     ADMIN: {
-      BASE: `${API_BASE_URL}/api/admin/flights`,
-      BY_ID: (id) => `${API_BASE_URL}/api/admin/flights/${id}`,
-      PAGINATED: `${API_BASE_URL}/api/admin/flights/page`,
+      BASE: `${API_BASE_URL}/api/flights/admin`,
+      BY_ID: (id) => `${API_BASE_URL}/api/flights/admin/${id}`,
     },
     // Public endpoints
     PUBLIC: {
-      SEARCH: `${API_BASE_URL}/api/public/flights/search`,
+      SEARCH: `${API_BASE_URL}/api/flights/search`,
+      BUDGET: `${API_BASE_URL}/api/flights/budget`,
+      BY_ID: (id) => `${API_BASE_URL}/api/flights/${id}`,
+      BY_CITY: (city) => `${API_BASE_URL}/api/flights/city/${encodeURIComponent(city)}`,
+      MIN_PRICES: `${API_BASE_URL}/api/flights/min-prices`,
     },
   },
 

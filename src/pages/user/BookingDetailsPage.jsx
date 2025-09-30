@@ -10,6 +10,81 @@ const BookingDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [destinationImage, setDestinationImage] = useState(null);
+  const [airportsMap, setAirportsMap] = useState({});
+
+  const fetchAirports = useCallback(async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.AIRPORTS.BASE);
+      if (response.ok) {
+        const airports = await response.json();
+        const map = {};
+        airports.forEach(airport => {
+          map[airport.code] = airport;
+        });
+        setAirportsMap(map);
+      }
+    } catch (err) {
+    }
+  }, []);
+
+  const fetchDestinationImage = useCallback(async (destination) => {
+    try {
+      if (!destination) {
+        return;
+      }
+      
+      const destinationCode = destination;
+      const destinationAirport = airportsMap[destinationCode];
+      
+      if (destinationAirport?.imageUrl) {
+        setDestinationImage(destinationAirport.imageUrl);
+        return;
+      }
+      
+      
+      const foundAirport = Object.values(airportsMap).find(airport => 
+        airport.city && airport.city.toLowerCase() === destination.toLowerCase()
+      );
+      
+      if (foundAirport?.imageUrl) {
+        setDestinationImage(foundAirport.imageUrl);
+        return;
+      }
+      
+      
+      const cityName = destination.replace(/[^a-zA-Z\s]/g, '').trim();
+      
+      const imageSources = [
+        `https://picsum.photos/800/300?random=${cityName.length + destination.length}`,
+        `https://picsum.photos/800/300?random=${Math.floor(Math.random() * 1000)}`,
+        `https://picsum.photos/800/300?blur=1`,
+        '/src/assets/images/background-img.jpg'
+      ];
+      
+      const tryImageSource = (index) => {
+        if (index >= imageSources.length) {
+          return;
+        }
+        
+        const imageUrl = imageSources[index];
+        const img = new Image();
+        
+        img.onload = () => {
+          setDestinationImage(imageUrl);
+        };
+        
+        img.onerror = () => {
+          tryImageSource(index + 1);
+        };
+        
+        img.src = imageUrl;
+      };
+      
+      tryImageSource(0);
+    } catch (err) {
+     
+    }
+  }, [airportsMap]);
 
   const fetchBookingDetails = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -20,6 +95,7 @@ const BookingDetailsPage = () => {
 
     try {
       setLoading(true);
+      setDestinationImage(null); 
       const response = await fetch(
         `${API_ENDPOINTS.BOOKINGS.BY_ID(bookingId)}`,
         {
@@ -30,8 +106,6 @@ const BookingDetailsPage = () => {
       if (response.ok) {
         const bookingData = await response.json();
         setBooking(bookingData);
-        
-        await fetchDestinationImage(bookingData.destinationAirport);
       } else {
         setError('Failed to fetch booking details');
       }
@@ -43,18 +117,23 @@ const BookingDetailsPage = () => {
   }, [bookingId, navigate]);
 
   useEffect(() => {
+    fetchAirports();
+  }, [fetchAirports]);
+
+  useEffect(() => {
     if (bookingId) {
       fetchBookingDetails();
     }
   }, [bookingId, fetchBookingDetails]);
 
-  const fetchDestinationImage = async (destination) => {
-    try {
-      const imageUrl = `https://picsum.photos/800/300?random=${destination.length}`;
-      setDestinationImage(imageUrl);
-    } catch (err) {
+  useEffect(() => {
+    if (booking?.destinationAirport && Object.keys(airportsMap).length > 0) {
+     
+      if (!destinationImage) {
+        fetchDestinationImage(booking.destinationAirport);
+      }
     }
-  };
+  }, [booking?.destinationAirport, airportsMap, fetchDestinationImage, destinationImage]);
 
   const handleCancelBooking = async () => {
     if (!window.confirm('Are you sure you want to cancel this booking?')) {
@@ -203,7 +282,7 @@ const BookingDetailsPage = () => {
               ) : (
                 <div className="destination-placeholder">
                   <div className="destination-icon">✈️</div>
-                  <h2 className="destination-name">{booking.destinationAirport}</h2>
+                  <h2 className="destination-name">{booking.destinationAirport || 'Destination'}</h2>
                   <p className="destination-subtitle">Your destination awaits</p>
                 </div>
               )}

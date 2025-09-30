@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { API_ENDPOINTS } from '../../config/api';
 import './AuthPages.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -46,10 +47,8 @@ const LoginPage = () => {
         if (data.accessToken) {
           localStorage.setItem('token', data.accessToken);
         }
-        
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
-          navigate('/profile');
         } else {
           try {
             const userResponse = await fetch(`${API_ENDPOINTS.USERS.BASE}/email/${encodeURIComponent(formData.email)}`, {
@@ -58,10 +57,8 @@ const LoginPage = () => {
                 'Content-Type': 'application/json',
               },
             });
-            
             if (userResponse.ok) {
               const userData = await userResponse.json();
-              console.log('User data from API:', userData);
               localStorage.setItem('user', JSON.stringify(userData));
             } else {
               const userData = {
@@ -85,9 +82,10 @@ const LoginPage = () => {
             };
             localStorage.setItem('user', JSON.stringify(userData));
           }
-          
-          navigate('/profile');
         }
+        const params = new URLSearchParams(location.search);
+        const redirect = params.get('redirect');
+        navigate(redirect || '/profile');
       } else {
         setError(data.message || 'Login failed');
       }
