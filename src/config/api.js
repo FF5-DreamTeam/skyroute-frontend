@@ -52,6 +52,7 @@ export const API_ENDPOINTS = {
   BOOKINGS: {
     BASE: `${API_BASE_URL}/api/bookings`,
     USER_BOOKINGS: `${API_BASE_URL}/api/bookings/user`,
+    USER_BOOKINGS_FILTERED: `${API_BASE_URL}/api/bookings/user/filtered`,
     BY_ID: (id) => `${API_BASE_URL}/api/bookings/${id}`,
     UPDATE_STATUS: (id, status) => `${API_BASE_URL}/api/bookings/${id}/status?status=${status}`,
     CONFIRM: (id) => `${API_BASE_URL}/api/bookings/${id}/confirm`,
@@ -70,6 +71,7 @@ export const API_ENDPOINTS = {
     // Public endpoints
     PUBLIC: {
       SEARCH: `${API_BASE_URL}/api/flights/search`,
+      SEARCH_FILTERS: `${API_BASE_URL}/api/flights/search-filters`,
       BUDGET: `${API_BASE_URL}/api/flights/budget`,
       BY_ID: (id) => `${API_BASE_URL}/api/flights/${id}`,
       BY_CITY: (city) => `${API_BASE_URL}/api/flights/city/${encodeURIComponent(city)}`,
