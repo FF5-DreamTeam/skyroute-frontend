@@ -2,6 +2,7 @@
   "name": "skyroute-front",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ff5-dreamteam.github.io/skyroute-frontend/",
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
