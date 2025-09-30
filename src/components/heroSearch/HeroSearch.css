@@ -184,7 +184,7 @@
 
 .hero-search__form-input {
   width: 100%;
-  padding: 1rem 1.25rem;
+  padding: 1.1rem 1.25rem;
   border: 1px solid var(--color-background-3);
   border-radius: 0.75rem;
   background-color: var(--color-background);
@@ -200,8 +200,12 @@
   box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
 }
 
-.hero-search__form-input[type="date"] {
-  color: var(--color-accent-2);
+/* Mantine DatePicker styles for hero search */
+.hero-date-input {
+  padding: 16px !important;
+  border-radius: 12px !important;
+  height: 48px !important;
+  font-family: var(--font-body) !important;
 }
 
 .hero-search__form-input[type="date"]::-webkit-datetime-edit-text {

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import 'react-phone-number-input/style.css';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { API_ENDPOINTS, getMultipartHeaders } from '../../config/api';
 import defaultUserImg from '../../assets/images/default-user-img.png';
 import './ProfilePage.css';
@@ -10,8 +15,6 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -90,10 +93,13 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    setError('');
-    setSuccess('');
 
     try {
+      if (!formData.phoneNumber || !isValidPhoneNumber(formData.phoneNumber)) {
+        toast.error('Please enter a valid phone number.');
+        setSaving(false);
+        return;
+      }
       const token = localStorage.getItem('token');
       const formDataToSend = new FormData();
       
@@ -116,14 +122,14 @@ const ProfilePage = () => {
       if (response.ok) {
         setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
-        setSuccess('Profile updated successfully!');
+        toast.success('Profile updated successfully!');
         setEditing(false);
         setFormData(prev => ({ ...prev, password: '' }));
       } else {
-        setError(data.message || 'Failed to update profile');
+        toast.error(data.message || 'Failed to update profile');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -141,8 +147,6 @@ const ProfilePage = () => {
     });
     setImagePreview(user?.userImgUrl || defaultUserImg);
     setEditing(false);
-    setError('');
-    setSuccess('');
   };
 
   const handleLogout = () => {
@@ -274,13 +278,21 @@ const ProfilePage = () => {
               <div className="profile-form-row">
                 <div className="profile-form-group">
                   <label className="profile-label">Birth Date:</label>
-                  {editing ? (
-                    <input
-                      type="date"
-                      name="birthDate"
-                      value={formData.birthDate}
-                      onChange={handleInputChange}
-                      className="profile-input"
+                {editing ? (
+                    <DatePickerInput
+                      value={formData.birthDate ? dayjs(formData.birthDate).toDate() : null}
+                      onChange={(date) => {
+                        const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                        setFormData(prev => ({ ...prev, birthDate: value }));
+                      }}
+                      placeholder="Select date"
+                      labelProps={{ style: { display: 'none' } }}
+                      maxDate={new Date()}
+                      valueFormat="DD/MM/YYYY"
+                      dropdownType="popover"
+                      popoverProps={{ withinPortal: true, position: 'bottom-start', offset: 8, zIndex: 3000 }}
+                      clearable
+                      classNames={{ input: 'profile-date-input' }}
                     />
                   ) : (
                     <span className="profile-value">{user?.birthDate || 'N/A'}</span>
@@ -289,12 +301,12 @@ const ProfilePage = () => {
                 
                 <div className="profile-form-group">
                   <label className="profile-label">Phone Number:</label>
-                  {editing ? (
-                    <input
-                      type="tel"
-                      name="phoneNumber"
+                {editing ? (
+                    <PhoneInput
+                      defaultCountry="ES"
+                      international
                       value={formData.phoneNumber}
-                      onChange={handleInputChange}
+                      onChange={(val) => setFormData(prev => ({ ...prev, phoneNumber: val || '' }))}
                       className="profile-input"
                     />
                   ) : (
@@ -317,17 +329,6 @@ const ProfilePage = () => {
                 </div>
               )}
 
-              {error && (
-                <div className="profile-error">
-                  {error}
-                </div>
-              )}
-
-              {success && (
-                <div className="profile-success">
-                  {success}
-                </div>
-              )}
 
               {editing && (
                 <div className="profile-actions">

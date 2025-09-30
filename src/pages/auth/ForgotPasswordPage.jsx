@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { API_ENDPOINTS } from '../../config/api';
 import './AuthPages.css';
 
@@ -12,8 +13,6 @@ const ForgotPasswordPage = () => {
     newPassword: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [step] = useState(searchParams.get('token') ? 'reset' : 'request');
 
   const handleInputChange = (e) => {
@@ -27,8 +26,6 @@ const ForgotPasswordPage = () => {
   const handleRequestReset = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const response = await fetch(API_ENDPOINTS.FORGOT_PASSWORD, {
@@ -42,12 +39,12 @@ const ForgotPasswordPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(data.message || 'Password reset instructions have been sent to your email');
+        toast.success(data.message || 'Password reset instructions have been sent to your email');
       } else {
-        setError(data.message || 'Failed to send reset instructions');
+        toast.error(data.message || 'Failed to send reset instructions');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -56,8 +53,6 @@ const ForgotPasswordPage = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const response = await fetch(`${API_ENDPOINTS.AUTH.LOGIN.replace('/login', '/reset-password')}`, {
@@ -74,15 +69,15 @@ const ForgotPasswordPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(data.message || 'Password has been successfully reset');
+        toast.success(data.message || 'Password has been successfully reset');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } else {
-        setError(data.message || 'Failed to reset password');
+        toast.error(data.message || 'Failed to reset password');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -131,17 +126,6 @@ const ForgotPasswordPage = () => {
               </>
             )}
 
-            {error && (
-              <div className="auth-error">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="auth-success">
-                {success}
-              </div>
-            )}
 
             <button
               type="submit"

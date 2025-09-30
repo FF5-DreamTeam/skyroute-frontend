@@ -111,7 +111,7 @@
 
 .profile-input {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 5px;
   border: 1px solid var(--color-background-2);
   border-radius: var(--radius-md);
   background-color: var(--color-background);
@@ -131,7 +131,7 @@
   font-family: var(--font-body);
   font-size: 1rem;
   color: var(--color-text);
-  padding: var(--spacing-md);
+  padding: calc(var(--spacing-md) + 2px);
   background-color: var(--color-background-2);
   border-radius: var(--radius-md);
   min-height: 20px;
@@ -315,4 +315,12 @@
   margin: 0;
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+/* Mantine DatePicker styles for profile */
+.profile-date-input {
+  padding: 14px 16px !important;
+  border-radius: 12px !important;
+  height: 48px !important;
+  font-family: var(--font-body) !important;
 }

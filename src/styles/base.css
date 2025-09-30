@@ -123,4 +123,107 @@
   .bg-accent {
     background-color: var(--color-accent-3);
   }
+
+  /* Mantine DatePicker theme overrides */
+  .mantine-DatePickerInput-input {
+    font-family: var(--font-body) !important;
+    border: 1px solid var(--color-background-2) !important;
+    border-radius: var(--radius-md) !important;
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .mantine-DatePickerInput-input:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1) !important;
+  }
+
+  .mantine-Popover-dropdown {
+    border: 1px solid var(--color-background-2) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
+    background-color: var(--color-background) !important;
+  }
+
+  .mantine-Calendar-header {
+    background-color: var(--color-success) !important;
+    border-bottom: 1px solid var(--color-background-3) !important;
+    padding: var(--spacing-sm) var(--spacing-md) !important;
+    border-top-left-radius: var(--radius-lg) !important;
+    border-top-right-radius: var(--radius-lg) !important;
+  }
+
+  .mantine-Calendar-headerLevel {
+    color: var(--color-background) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+  }
+
+  .mantine-Calendar-day {
+    color: var(--color-text-2) !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .mantine-Calendar-day:hover {
+    background-color: var(--color-background-3) !important;
+  }
+
+  .mantine-Calendar-day[data-selected] {
+    background-color: var(--color-primary) !important;
+    color: var(--color-background) !important;
+  }
+
+  .mantine-Calendar-day[data-in-range] {
+    background-color: var(--color-main-light) !important;
+    color: var(--color-text) !important;
+  }
+
+  .mantine-Calendar-weekday {
+    color: var(--color-text-2) !important;
+    font-weight: 600 !important;
+  }
+
+  .mantine-Calendar-control {
+    color: var(--color-background) !important;
+  }
+
+  .mantine-Calendar-control:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Sonner toast customizations */
+  .custom-toast {
+    font-family: var(--font-body) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+
+  [data-sonner-toast] {
+    background: var(--color-background) !important;
+    border: 1px solid var(--color-background-2) !important;
+    border-radius: var(--radius-lg) !important;
+    color: var(--color-text) !important;
+    font-family: var(--font-body) !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+
+  [data-sonner-toast][data-type="success"] {
+    background: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+    color: var(--color-success) !important;
+  }
+
+  [data-sonner-toast][data-type="error"] {
+    background: #fef2f2 !important;
+    border-color: #fecaca !important;
+    color: var(--color-error) !important;
+  }
+
+  [data-sonner-toast][data-type="warning"] {
+    background: #fef3cd !important;
+    border-color: #fde68a !important;
+    color: var(--color-warning) !important;
+  }
 }

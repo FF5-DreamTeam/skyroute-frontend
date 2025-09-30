@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 import { API_ENDPOINTS } from '../../config/api';
 
 const FlightDetailsPage = () => {
@@ -110,7 +111,7 @@ const FlightDetailsPage = () => {
 
   const attemptBooking = async () => {
     if (!token) {
-      alert('You must log in to book a flight.');
+      toast.error('You must log in to book a flight.');
       const redirect = `${location.pathname}${location.search || ''}`;
       navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
       return;
@@ -119,7 +120,7 @@ const FlightDetailsPage = () => {
     const names = passengers.map(p => p.name?.trim()).filter(Boolean);
     const dates = passengers.map(p => p.birthDate?.trim()).filter(Boolean);
     if (names.length !== passengers.length || dates.length !== passengers.length) {
-      alert('Please complete all passenger details.');
+      toast.error('Please complete all passenger details.');
       return;
     }
 
@@ -157,10 +158,10 @@ const FlightDetailsPage = () => {
         if (!returnRes.ok) throw new Error(`Failed to book return flight: HTTP ${returnRes.status}`);
       }
 
-      alert(returnFlight ? 'Round-trip booking created successfully.' : 'Booking created successfully.');
+      toast.success(returnFlight ? 'Round-trip booking created successfully.' : 'Booking created successfully.');
       navigate('/bookings');
     } catch (err) {
-      alert(err.message || 'Failed to create booking');
+      toast.error(err.message || 'Failed to create booking');
     }
   };
 
