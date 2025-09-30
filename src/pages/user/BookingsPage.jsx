@@ -21,7 +21,7 @@ const BookingsPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=${currentPage}&size=10&sortBy=departureTime&sortDirection=ASC`,
+        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=${currentPage}&size=10`,
         {
           headers: getAuthHeaders(token)
         }
@@ -29,10 +29,14 @@ const BookingsPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        const currentBookings = data.content.filter(booking => 
-          new Date(booking.departureTime) >= new Date()
-        );
-        setBookings(currentBookings);
+        
+        const sortedBookings = data.content.sort((a, b) => {
+          return (b.bookingId || b.id || 0) - (a.bookingId || a.id || 0);
+        });
+        
+        console.log('Booking IDs after sorting:', sortedBookings.map(b => b.bookingId || b.id));
+        
+        setBookings(sortedBookings);
         setTotalPages(data.totalPages);
       } else {
         setError('Failed to fetch current bookings');
@@ -140,8 +144,8 @@ const BookingsPage = () => {
     <div className="bookings-page">
       <div className="bookings-container">
         <div className="bookings-header">
-          <h1 className="bookings-title">Current Bookings</h1>
-          <p className="bookings-subtitle">Your upcoming flight bookings</p>
+          <h1 className="bookings-title">My Bookings</h1>
+          <p className="bookings-subtitle">All your flight bookings (newest first)</p>
         </div>
 
         {error && (
@@ -153,8 +157,8 @@ const BookingsPage = () => {
         {bookings.length === 0 ? (
           <div className="bookings-empty">
             <div className="bookings-empty-icon">✈️</div>
-            <h3>No Current Bookings</h3>
-            <p>You don't have any upcoming flights booked.</p>
+            <h3>No Bookings Found</h3>
+            <p>You don't have any flight bookings yet.</p>
           </div>
         ) : (
           <div className="bookings-content">

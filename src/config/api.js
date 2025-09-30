@@ -73,6 +73,7 @@ export const API_ENDPOINTS = {
       BUDGET: `${API_BASE_URL}/api/flights/budget`,
       BY_ID: (id) => `${API_BASE_URL}/api/flights/${id}`,
       BY_CITY: (city) => `${API_BASE_URL}/api/flights/city/${encodeURIComponent(city)}`,
+      MIN_PRICES: `${API_BASE_URL}/api/flights/min-prices`,
     },
   },
 

@@ -21,7 +21,7 @@ const HistoryPage = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=${currentPage}&size=10&sortBy=departureTime&sortDirection=DESC`,
+        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=${currentPage}&size=10&sortBy=createdAt&sortDirection=DESC`,
         {
           headers: getAuthHeaders(token)
         }

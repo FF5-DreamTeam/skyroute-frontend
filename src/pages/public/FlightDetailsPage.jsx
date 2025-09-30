@@ -14,6 +14,7 @@ const FlightDetailsPage = () => {
 
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const returnFlightId = searchParams.get('return');
+  const passengersCount = parseInt(searchParams.get('passengers')) || 1;
 
   const token = localStorage.getItem('token');
   const userProfile = useMemo(() => {
@@ -74,15 +75,35 @@ const FlightDetailsPage = () => {
     loadAirports();
   }, []);
 
-  const [passengers, setPassengers] = useState([{ name: '', birthDate: '' }]);
-  const [seats, setSeats] = useState(1);
+  const [passengers, setPassengers] = useState(() => 
+    Array.from({ length: passengersCount }, () => ({ name: '', birthDate: '' }))
+  );
+  const [seats, setSeats] = useState(passengersCount);
   useEffect(() => {
     if (token && userProfile) {
-      setPassengers([{ name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(), birthDate: userProfile.birthDate || '' }]);
+      const userPassenger = { 
+        name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(), 
+        birthDate: userProfile.birthDate || '' 
+      };
+      
+      setPassengers(prev => 
+        prev.map((passenger, index) => 
+          index === 0 ? userPassenger : passenger
+        )
+      );
     }
-  }, [token, userProfile]);
+  }, [token, userProfile, passengersCount]);
 
-  const addPassenger = () => setPassengers(prev => [...prev, { name: '', birthDate: '' }]);
+  
+  useEffect(() => {
+    setSeats(passengers.length);
+  }, [passengers.length]);
+
+  const addPassenger = () => {
+    if (passengers.length < passengersCount) {
+      setPassengers(prev => [...prev, { name: '', birthDate: '' }]);
+    }
+  };
   const updatePassenger = (index, field, value) => {
     setPassengers(prev => prev.map((p, i) => i === index ? { ...p, [field]: value } : p));
   };
@@ -283,7 +304,7 @@ const FlightDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero banner with destination image and uppercase city */}
+      
       {(destinationCity || destinationCode) && (
         <div className="relative">
           {destinationImage ? (
@@ -314,10 +335,10 @@ const FlightDetailsPage = () => {
               </div>
             )}
 
-            {/* Outbound flight card */}
+            
             {renderFlightCard(flight, returnFlight ? 'Outbound Flight' : '')}
 
-            {/* Return flight card */}
+            
             {returnFlight && renderFlightCard(returnFlight, 'Return Flight')}
 
             <div className="bg-white rounded-lg shadow p-4">
@@ -331,10 +352,20 @@ const FlightDetailsPage = () => {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Seats</label>
-                    <input type="number" min="1" max={flight.availableSeats || 10} value={seats} onChange={(e) => setSeats(e.target.value)} className="border rounded px-3 py-2 w-32" />
+                    <input 
+                      type="number" 
+                      min="1" 
+                      max={flight.availableSeats || 10} 
+                      value={seats} 
+                      readOnly
+                      className="border rounded px-3 py-2 w-32 bg-gray-100" 
+                      title="Seats automatically match number of passengers"
+                    />
                   </div>
                   <div className="space-y-2">
-                    <div className="font-medium text-gray-800">Passengers</div>
+                    <div className="font-medium text-gray-800">
+                      Passengers ({passengersCount} selected in search)
+                    </div>
                     {passengers.map((p, idx) => (
                       <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <input
@@ -351,7 +382,11 @@ const FlightDetailsPage = () => {
                         />
                       </div>
                     ))}
-                    <button className="text-sm text-blue-600 underline" onClick={addPassenger}>Add passenger</button>
+                    {passengers.length < passengersCount && (
+                      <button className="text-sm text-blue-600 underline" onClick={addPassenger}>
+                        Add passenger
+                      </button>
+                    )}
                   </div>
                   {returnFlight && (
                     <div className="bg-blue-50 border border-blue-200 rounded p-3">

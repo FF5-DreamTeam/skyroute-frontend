@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import backgroundImg from '../../assets/images/background-img.jpg';
 import { API_ENDPOINTS } from '../../config/api';
 import './HeroSearch.css';
 
 const HeroSearch = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchData, setSearchData] = useState({
     from: '',
     to: '',
@@ -105,6 +106,44 @@ const HeroSearch = () => {
 
     fetchAllAirports();
   }, []);
+
+  useEffect(() => {
+    if (airports.length === 0) return;
+    
+    const params = new URLSearchParams(location.search);
+    const origin = params.get('origin') || '';
+    const destination = params.get('destination') || '';
+    const departureDate = params.get('departureDate') || '';
+    const returnDate = params.get('returnDate') || '';
+    const passengers = params.get('passengers') || '1';
+    const city = params.get('city'); 
+
+    if (city) return;
+
+    const findAirport = (query) => {
+      if (!query) return null;
+      return airports.find(airport => 
+        airport.code === query || 
+        airport.city.toLowerCase() === query.toLowerCase() ||
+        airport.name.toLowerCase().includes(query.toLowerCase())
+      );
+    };
+
+    const originAirport = findAirport(origin);
+    const destinationAirport = findAirport(destination);
+
+    setSearchData(prev => ({
+      ...prev,
+      from: originAirport ? `${originAirport.city} (${originAirport.code})` : origin,
+      to: destinationAirport ? `${destinationAirport.city} (${destinationAirport.code})` : destination,
+      outbound: departureDate,
+      return: returnDate,
+      passengers: parseInt(passengers) || 1
+    }));
+
+    setFromSearch(originAirport ? `${originAirport.city} (${originAirport.code})` : origin);
+    setToSearch(destinationAirport ? `${destinationAirport.city} (${destinationAirport.code})` : destination);
+  }, [location.search, airports]);
 
   useEffect(() => {
     if (fromSearch && fromSearch.trim() !== '') {

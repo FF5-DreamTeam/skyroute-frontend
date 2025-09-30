@@ -28,7 +28,7 @@ const SearchPage = () => {
   const destination = params.get('destination') || '';
   const departureDate = params.get('departureDate') || '';
   const returnDate = params.get('returnDate') || '';
-  const passengers = params.get('passengers') || '';
+  const passengers = parseInt(params.get('passengers')) || 1;
   const budget = params.get('budget');
   const city = params.get('city');
 
@@ -101,7 +101,7 @@ const SearchPage = () => {
         };
         const formatDateForBackend = (dateString) => {
           if (!dateString) return '';
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) return dateString;  
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) return dateString;
           const d = new Date(dateString);
           if (Number.isNaN(d.getTime())) return '';
           const dd = String(d.getDate()).padStart(2, '0');
@@ -173,7 +173,8 @@ const SearchPage = () => {
         if (!baseDate) return;
 
         const alternativeDates = [];
-        for (let offset = 1; offset <= 30; offset++) {
+        for (let offset = -15; offset <= 30; offset++) {
+          if (offset === 0) continue; 
           const altDate = new Date(baseDate);
           altDate.setDate(altDate.getDate() + offset);
           alternativeDates.push({
@@ -279,7 +280,8 @@ const SearchPage = () => {
         if (!baseDate) return;
 
         const alternativeDates = [];
-        for (let offset = 1; offset <= 30; offset++) {
+        for (let offset = -15; offset <= 30; offset++) {
+          if (offset === 0) continue; 
           const altDate = new Date(baseDate);
           altDate.setDate(altDate.getDate() + offset);
           alternativeDates.push({
@@ -409,7 +411,7 @@ const SearchPage = () => {
           }
         }
         setReturnFlights([]);
-      } catch (err) { 
+      } catch (err) {
       } finally {
         setLoadingReturn(false);
       }
@@ -650,7 +652,7 @@ const SearchPage = () => {
                         
                         <div className="round-trip-actions">
                           <Link
-                            to={`/flight/${combination.outbound.id}?return=${combination.return.id}`}
+                            to={`/flight/${combination.outbound.id}?return=${combination.return.id}&passengers=${passengers}`}
                             className="book-round-trip-button"
                           >
                             Book Round-trip
@@ -666,7 +668,7 @@ const SearchPage = () => {
             ) : (
               <div className="results-list">
                 {results.map((flight) => (
-            <Link key={flight.id} to={`/flight/${flight.id}`} className="flight-card">
+            <Link key={flight.id} to={`/flight/${flight.id}?passengers=${passengers}`} className="flight-card">
               <div className="flight-card-content">
                 <div className="flight-info">
                   <div className="flight-number">{flight.flightNumber || 'Flight'}</div>
@@ -781,7 +783,7 @@ const SearchPage = () => {
                               €{Number(flight.price || 0).toFixed(2)}
                             </div>
                             <Link
-                              to={`/flight/${flight.id}`}
+                              to={`/flight/${flight.id}?passengers=${passengers}`}
                               className="view-details-button"
                             >
                               View Details
@@ -916,7 +918,7 @@ const SearchPage = () => {
                   
                   <div className="alternative-round-trip-actions">
                     <Link
-                      to={`/flight/${combination.outbound.id}?return=${combination.return.id}`}
+                      to={`/flight/${combination.outbound.id}?return=${combination.return.id}&passengers=${passengers}`}
                       className="book-alternative-round-trip-button"
                     >
                       Book Round-trip
@@ -994,7 +996,7 @@ const SearchPage = () => {
                             €{Number(flight.price || 0).toFixed(2)}
                           </div>
                           <Link
-                            to={`/flight/${flight.id}`}
+                            to={`/flight/${flight.id}?passengers=${passengers}`}
                             className="view-details-button"
                           >
                             View Details
