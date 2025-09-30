@@ -14,7 +14,7 @@ const ForgotPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [step, setStep] = useState(searchParams.get('token') ? 'reset' : 'request');
+  const [step] = useState(searchParams.get('token') ? 'reset' : 'request');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
