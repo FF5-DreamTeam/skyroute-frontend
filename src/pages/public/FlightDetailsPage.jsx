@@ -1,7 +1,108 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { API_ENDPOINTS } from '../../config/api';
+import './FlightDetailsPage.css';
+
+  
+const DateInput = ({ value, onChange, placeholder, maxDate, inputRef }) => {
+  const [displayValue, setDisplayValue] = useState(value || '');
+
+  useEffect(() => {
+    if (!value) {
+      setDisplayValue('');
+      return;
+    }
+    const ymdMatch = /^\d{4}-\d{2}-\d{2}$/.test(value);
+    if (ymdMatch) {
+      const [y, m, d] = value.split('-');
+      setDisplayValue(`${d}/${m}/${y}`);
+    } else {
+      setDisplayValue(value);
+    }
+  }, [value]);
+
+  const handleChange = (e) => {
+    let input = e.target.value.replace(/\D/g, ''); 
+    
+    if (input.length > 8) {
+      input = input.substring(0, 8);
+    }
+    
+    let formatted = input;
+    if (input.length >= 2) {
+      formatted = input.substring(0, 2) + '/' + input.substring(2);
+    }
+    if (input.length >= 4) {
+      formatted = input.substring(0, 2) + '/' + input.substring(2, 4) + '/' + input.substring(4);
+    }
+    
+    setDisplayValue(formatted);
+    
+    if (input.length === 8) {
+      const day = input.substring(0, 2);
+      const month = input.substring(2, 4);
+      const year = input.substring(4, 8);
+      
+      const dayNum = parseInt(day, 10);
+      const monthNum = parseInt(month, 10);
+      const yearNum = parseInt(year, 10);
+      
+      if (dayNum >= 1 && dayNum <= 31 && 
+          monthNum >= 1 && monthNum <= 12 && 
+          yearNum >= 1900 && yearNum <= new Date().getFullYear()) {
+        
+        const date = new Date(yearNum, monthNum - 1, dayNum);
+        
+        if (date.getFullYear() === yearNum && 
+            date.getMonth() === monthNum - 1 && 
+            date.getDate() === dayNum &&
+            (!maxDate || date <= maxDate)) {
+          const ymd = `${yearNum}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          onChange(ymd);
+        } else {
+          onChange(''); 
+        }
+      } else {
+        onChange(''); 
+      }
+    } else if (input.length > 0) {
+      
+      onChange(''); 
+    } else {
+      onChange(''); 
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if ([8, 9, 27, 46, 37, 38, 39, 40].indexOf(e.keyCode) !== -1 ||
+        
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+    }
+  };
+
+  return (
+    <input
+      type="text"
+      className="booking-passenger-date-input"
+      placeholder={placeholder || "DD/MM/YYYY"}
+      value={displayValue}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
+      maxLength={10}
+      ref={inputRef}
+      aria-invalid={displayValue && displayValue.length === 10 && !value}
+    />
+  );
+};
 
 const FlightDetailsPage = () => {
   const { id } = useParams();
@@ -12,6 +113,9 @@ const FlightDetailsPage = () => {
   const [flight, setFlight] = useState(null);
   const [returnFlight, setReturnFlight] = useState(null);
   const [airportsMap, setAirportsMap] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const nameRefs = useRef([]);
+  const dateRefs = useRef([]);
 
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const returnFlightId = searchParams.get('return');
@@ -26,6 +130,7 @@ const FlightDetailsPage = () => {
       return null;
     }
   }, []);
+
 
   useEffect(() => {
     const loadFlights = async () => {
@@ -101,8 +206,12 @@ const FlightDetailsPage = () => {
   }, [passengers.length]);
 
   const addPassenger = () => {
-    if (passengers.length < passengersCount) {
-      setPassengers(prev => [...prev, { name: '', birthDate: '' }]);
+    setPassengers(prev => [...prev, { name: '', birthDate: '' }]);
+  };
+
+  const removePassenger = (index) => {
+    if (passengers.length > 1) {
+      setPassengers(prev => prev.filter((_, i) => i !== index));
     }
   };
   const updatePassenger = (index, field, value) => {
@@ -110,6 +219,36 @@ const FlightDetailsPage = () => {
   };
 
   const attemptBooking = async () => {
+    setSubmitted(true);
+
+    
+    const names = passengers.map(p => p.name?.trim()).filter(Boolean);
+    const dates = passengers.map(p => p.birthDate?.trim()).filter(Boolean);
+    const allNamesPresent = names.length === passengers.length;
+    const allDatesPresent = dates.length === passengers.length;
+    
+        
+    console.log('Validation check:', {
+      passengers: passengers.length,
+      names: names.length,
+      dates: dates.length,
+      allNamesPresent,
+      allDatesPresent,
+      passengerData: passengers.map(p => ({ name: p.name, birthDate: p.birthDate }))
+    });
+    
+    if (!allNamesPresent || !allDatesPresent) {
+      
+      const firstInvalidIndex = passengers.findIndex(
+        (p) => !(p.name && p.name.trim()) || !(p.birthDate && p.birthDate.trim())
+      );
+      const missingName = firstInvalidIndex !== -1 && !(passengers[firstInvalidIndex].name && passengers[firstInvalidIndex].name.trim());
+      const el = missingName ? nameRefs.current[firstInvalidIndex] : dateRefs.current[firstInvalidIndex];
+      if (el && el.scrollIntoView) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (el.focus) el.focus();
+      }
+    }
     if (!token) {
       toast.error('You must log in to book a flight.');
       const redirect = `${location.pathname}${location.search || ''}`;
@@ -117,8 +256,6 @@ const FlightDetailsPage = () => {
       return;
     }
 
-    const names = passengers.map(p => p.name?.trim()).filter(Boolean);
-    const dates = passengers.map(p => p.birthDate?.trim()).filter(Boolean);
     if (names.length !== passengers.length || dates.length !== passengers.length) {
       toast.error('Please complete all passenger details.');
       return;
@@ -139,7 +276,7 @@ const FlightDetailsPage = () => {
         })
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      await res.json();
+      const outboundBooking = await res.json();
 
       if (returnFlightId && returnFlight) {
         const returnRes = await fetch(API_ENDPOINTS.BOOKINGS.BASE, {
@@ -156,9 +293,15 @@ const FlightDetailsPage = () => {
           })
         });
         if (!returnRes.ok) throw new Error(`Failed to book return flight: HTTP ${returnRes.status}`);
+        const returnBooking = await returnRes.json();
+        const backendTotal = Number(outboundBooking?.totalPrice || 0) + Number(returnBooking?.totalPrice || 0);
+        toast.success(`Round-trip booking created successfully. Total: €${backendTotal.toFixed(2)}`);
+        navigate('/bookings');
+        return;
       }
 
-      toast.success(returnFlight ? 'Round-trip booking created successfully.' : 'Booking created successfully.');
+      const backendTotal = Number(outboundBooking?.totalPrice || 0);
+      toast.success(`Booking created successfully. Total: €${backendTotal.toFixed(2)}`);
       navigate('/bookings');
     } catch (err) {
       toast.error(err.message || 'Failed to create booking');
@@ -253,41 +396,44 @@ const FlightDetailsPage = () => {
     });
   };
 
-  const renderFlightCard = (flightData, label) => {
+  const renderFlightCard = (flightData, label, seatsCount = 1) => {
     const { originCity, originCode, destinationCity, destinationCode } = getFlightDetails(flightData);
 
     return (
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="flight-card">
+        <div className="flight-card-header">
           <div>
-            <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">{label}</div>
-            <div className="font-bold text-gray-900">{flightData.flightNumber}</div>
+            <div className="flight-card-label">{label}</div>
+            <div className="flight-card-number">{flightData.flightNumber}</div>
           </div>
-          <div className="text-emerald-700 text-xl font-bold">€{Number(flightData.price || 0).toFixed(2)}</div>
+          <div className="flight-card-price">
+            <div className="flight-price-per-seat">€{Number(flightData.price || 0).toFixed(2)}/seat</div>
+            <div className="flight-price-total">Total: €{(Number(flightData.price || 0) * seatsCount).toFixed(2)}</div>
+          </div>
         </div>
-        <div className="p-4">
-          <div className="flex items-center gap-3 text-gray-800">
-            <div className="text-lg font-semibold">{originCity}</div>
-            <div className="px-2 py-0.5 bg-gray-100 rounded text-sm font-semibold">{originCode}</div>
-            <div className="text-gray-500">→</div>
-            <div className="text-lg font-semibold">{destinationCity}</div>
-            <div className="px-2 py-0.5 bg-gray-100 rounded text-sm font-semibold">{destinationCode}</div>
+        <div className="flight-card-body">
+          <div className="flight-route">
+            <div className="flight-city">{originCity}</div>
+            <div className="flight-code">{originCode}</div>
+            <div className="flight-arrow">→</div>
+            <div className="flight-city">{destinationCity}</div>
+            <div className="flight-code">{destinationCode}</div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-lg p-3">
-              <div className="text-xs uppercase tracking-wide text-gray-500">Departure</div>
-              <div className="text-gray-900 font-semibold">
+          <div className="flight-times">
+            <div className="flight-time-card">
+              <div className="flight-time-label">Departure</div>
+              <div className="flight-time-date">
                 {formatDate(flightData.departureTime || flightData.departureDate)}
               </div>
-              <div className="text-gray-700">{formatTime(flightData.departureTime || flightData.departureDate)}</div>
+              <div className="flight-time-time">{formatTime(flightData.departureTime || flightData.departureDate)}</div>
             </div>
-            <div className="border rounded-lg p-3">
-              <div className="text-xs uppercase tracking-wide text-gray-500">Arrival</div>
-              <div className="text-gray-900 font-semibold">
+            <div className="flight-time-card">
+              <div className="flight-time-label">Arrival</div>
+              <div className="flight-time-date">
                 {formatDate(flightData.arrivalTime || flightData.arrivalDate)}
               </div>
-              <div className="text-gray-700">{formatTime(flightData.arrivalTime || flightData.arrivalDate)}</div>
+              <div className="flight-time-time">{formatTime(flightData.arrivalTime || flightData.arrivalDate)}</div>
             </div>
           </div>
         </div>
@@ -296,27 +442,27 @@ const FlightDetailsPage = () => {
   };
 
   const totalPrice = useMemo(() => {
-    let total = Number(flight?.price || 0);
-    if (returnFlight) {
-      total += Number(returnFlight.price || 0);
-    }
-    return total;
-  }, [flight, returnFlight]);
+    const perSeatOutbound = Number(flight?.price || 0);
+    const perSeatReturn = returnFlight ? Number(returnFlight.price || 0) : 0;
+    const perSeatTotal = perSeatOutbound + perSeatReturn;
+    const seatsCount = Number(seats || 1);
+    return perSeatTotal * seatsCount;
+  }, [flight, returnFlight, seats]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flight-details-page">
       
       {(destinationCity || destinationCode) && (
-        <div className="relative">
+        <div className="flight-hero">
           {destinationImage ? (
-            <img src={destinationImage} alt={destinationCity} className="w-full h-72 object-cover" />
+            <img src={destinationImage} alt={destinationCity} className="flight-hero-image" />
           ) : (
-            <div className="w-full h-72 bg-gradient-to-r from-blue-600 to-purple-600" />
+            <div className="flight-hero-gradient" />
           )}
-          <div className="absolute inset-0 bg-black/30" />
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="container mx-auto px-4">
-              <h1 className="text-white text-4xl md:text-5xl font-extrabold tracking-wide" style={{ textTransform: 'uppercase' }}>
+          <div className="flight-hero-overlay" />
+          <div className="flight-hero-content">
+            <div className="flight-container">
+              <h1 className="flight-hero-title">
                 {destinationCity} {destinationCode && <span>({destinationCode})</span>}
               </h1>
             </div>
@@ -324,80 +470,106 @@ const FlightDetailsPage = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8">
-        {loading && <p className="text-gray-600">Loading...</p>}
-        {error && <p className="text-red-600">{error}</p>}
+      <div className="flight-container">
+        {loading && <p className="flight-loading">Loading...</p>}
+        {error && <p className="flight-error">{error}</p>}
         {!loading && !error && flight && (
-          <div className="space-y-6">
+          <div className="flight-sections">
             {returnFlight && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h2 className="text-xl font-semibold text-blue-900 mb-2">Round-trip Flight</h2>
-                <div className="text-2xl font-bold text-emerald-700">Total: €{totalPrice.toFixed(2)}</div>
+              <div className="roundtrip-summary">
+                <h2 className="roundtrip-title">Round-trip Flight</h2>
+                <div className="roundtrip-total">Total: €{totalPrice.toFixed(2)}</div>
               </div>
             )}
 
             
-            {renderFlightCard(flight, returnFlight ? 'Outbound Flight' : '')}
+            {renderFlightCard(flight, returnFlight ? 'Outbound Flight' : '', seats)}
 
             
-            {returnFlight && renderFlightCard(returnFlight, 'Return Flight')}
+            {returnFlight && renderFlightCard(returnFlight, 'Return Flight', seats)}
 
-            <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-xl font-semibold mb-3">Booking</h2>
+            <div className="booking-section">
+              <h2 className="booking-title">Booking</h2>
               {!token ? (
-                <p className="text-gray-700">To book this flight, please log in. <button className="text-blue-600 underline" onClick={() => {
+                <p className="booking-login-text">To book this flight, please log in. <button className="booking-login-link" onClick={() => {
                   const redirect = `${location.pathname}${location.search || ''}`;
                   navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
                 }}>Log in</button></p>
               ) : (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Seats</label>
+                <div className="booking-form">
+                  <div className="booking-seats-group">
+                    <label className="booking-seats-label">Seats</label>
                     <input 
                       type="number" 
                       min="1" 
                       max={flight.availableSeats || 10} 
                       value={seats} 
-                      readOnly
-                      className="border rounded px-3 py-2 w-32 bg-gray-100" 
-                      title="Seats automatically match number of passengers"
+                      onChange={(e) => {
+                        const newSeats = Math.max(1, Math.min(flight.availableSeats || 10, parseInt(e.target.value) || 1));
+                        setSeats(newSeats);
+
+                        if (newSeats > passengers.length) {
+                          const newPassengers = Array.from({ length: newSeats - passengers.length }, () => ({ name: '', birthDate: '' }));
+                          setPassengers(prev => [...prev, ...newPassengers]);
+                        } else if (newSeats < passengers.length) {
+                         
+                          setPassengers(prev => prev.slice(0, newSeats));
+                        }
+                      }}
+                      className="booking-seats-input" 
+                      title="Number of seats and passengers"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <div className="font-medium text-gray-800">
-                      Passengers ({passengersCount} selected in search)
+                  <div className="booking-passengers-group">
+                    <div className="booking-passengers-label">
+                      Passengers ({passengers.length} total)
                     </div>
                     {passengers.map((p, idx) => (
-                      <div key={idx} className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <input
-                          className="border rounded px-3 py-2"
-                          placeholder={`Passenger full name #${idx + 1}`}
-                          value={p.name}
-                          onChange={(e) => updatePassenger(idx, 'name', e.target.value)}
-                        />
-                        <input
-                          className="border rounded px-3 py-2"
-                          type="date"
-                          value={p.birthDate}
-                          onChange={(e) => updatePassenger(idx, 'birthDate', e.target.value)}
-                        />
+                      <div key={idx} className={`booking-passenger-row`}>
+                        <div className="booking-passenger-inputs">
+                          <input
+                            className="booking-passenger-input"
+                            placeholder={`Passenger full name #${idx + 1}`}
+                            value={p.name}
+                            onChange={(e) => updatePassenger(idx, 'name', e.target.value)}
+                            ref={el => nameRefs.current[idx] = el}
+                            aria-invalid={submitted && !(p.name && p.name.trim())}
+                          />
+                          <DateInput
+                            value={p.birthDate}
+                            onChange={(date) => updatePassenger(idx, 'birthDate', date)}
+                            placeholder="DD/MM/YYYY"
+                            maxDate={new Date()}
+                            inputRef={el => dateRefs.current[idx] = el}
+                          />
+                        </div>
+                        {passengers.length > 1 && (
+                          <button 
+                            className="booking-remove-passenger"
+                            onClick={() => removePassenger(idx)}
+                            title="Remove passenger"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
                     ))}
-                    {passengers.length < passengersCount && (
-                      <button className="text-sm text-blue-600 underline" onClick={addPassenger}>
-                        Add passenger
+                    {passengers.length < (flight.availableSeats || 10) && (
+                      <button className="booking-add-passenger" onClick={addPassenger}>
+                        + Add passenger
                       </button>
                     )}
                   </div>
-                  {returnFlight && (
-                    <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">Total Price:</span>
-                        <span className="text-2xl font-bold text-emerald-700">€{totalPrice.toFixed(2)}</span>
-                      </div>
+                  <div className="booking-total">
+                    <div className="booking-total-row">
+                      <span className="booking-total-label">Total Price:</span>
+                      <span className="booking-total-price">€{totalPrice.toFixed(2)}</span>
                     </div>
-                  )}
-                  <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded" onClick={attemptBooking}>
+                  </div>
+                  <button className="booking-button" onClick={attemptBooking} disabled={submitted && (
+                    passengers.some(p => !(p.name && p.name.trim())) ||
+                    passengers.some(p => !(p.birthDate && p.birthDate.trim()))
+                  )}>
                     {returnFlight ? 'Book Round-trip' : 'Book now'}
                   </button>
                 </div>
