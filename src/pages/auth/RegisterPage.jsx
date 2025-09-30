@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { API_ENDPOINTS } from '../../config/api';
 import './AuthPages.css';
 
@@ -12,7 +13,6 @@ const RegisterPage = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +25,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
@@ -45,12 +44,13 @@ const RegisterPage = () => {
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }
+        toast.success('Registration successful!');
         navigate('/profile');
       } else {
-        setError(data.message || 'Registration failed');
+        toast.error(data.message || 'Registration failed');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -121,11 +121,6 @@ const RegisterPage = () => {
               />
             </div>
 
-            {error && (
-              <div className="auth-error">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"

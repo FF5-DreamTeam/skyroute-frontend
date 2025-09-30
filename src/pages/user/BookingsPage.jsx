@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Modal, Button, Text, Stack, Alert } from '@mantine/core';
+import { toast } from 'sonner';
 import { API_ENDPOINTS, getAuthHeaders } from '../../config/api';
 import './BookingsPage.css';
 
@@ -10,6 +12,9 @@ const BookingsPage = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -52,49 +57,59 @@ const BookingsPage = () => {
     fetchBookings();
   }, [fetchBookings]);
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('Are you sure you want to cancel this booking?')) {
-      return;
-    }
+  const openCancelModal = (bookingId) => {
+    setBookingToCancel(bookingId);
+    setCancelModalOpen(true);
+  };
+
+  const closeCancelModal = () => {
+    setCancelModalOpen(false);
+    setBookingToCancel(null);
+  };
+
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return;
 
     const token = localStorage.getItem('token');
     if (!token) {
-      setError('No authentication token found');
+      toast.error('No authentication token found');
+      closeCancelModal();
       return;
     }
 
     try {
-      setLoading(true);
-      setError('');
+      setCancelling(true);
       
-      const response = await fetch(API_ENDPOINTS.BOOKINGS.CANCEL(bookingId), {
+      const response = await fetch(API_ENDPOINTS.BOOKINGS.CANCEL(bookingToCancel), {
         method: 'POST',
         headers: getAuthHeaders(token)
       });
 
       if (response.status === 204) {
+        toast.success('Booking cancelled successfully!');
         fetchBookings();
+        closeCancelModal();
       } else if (response.status === 400) {
-        setError('Invalid status transition - booking cannot be cancelled');
+        toast.error('Invalid status transition - booking cannot be cancelled');
       } else if (response.status === 401) {
-        setError('Unauthorized - please log in again');
+        toast.error('Unauthorized - please log in again');
         navigate('/login');
       } else if (response.status === 403) {
-        setError('Access denied - you can only cancel your own bookings');
+        toast.error('Access denied - you can only cancel your own bookings');
       } else if (response.status === 404) {
-        setError('Booking not found');
+        toast.error('Booking not found');
       } else {
         try {
           const errorData = await response.json();
-          setError(errorData.message || `Failed to cancel booking (Status: ${response.status})`);
+          toast.error(errorData.message || `Failed to cancel booking (Status: ${response.status})`);
         } catch {
-          setError(`Failed to cancel booking (Status: ${response.status})`);
+          toast.error(`Failed to cancel booking (Status: ${response.status})`);
         }
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
-      setLoading(false);
+      setCancelling(false);
     }
   };
 
@@ -233,11 +248,11 @@ const BookingsPage = () => {
                       </button>
                       {booking.bookingStatus === 'CONFIRMED' && (
                         <button 
-                          onClick={() => handleCancelBooking(booking.bookingId)}
+                          onClick={() => openCancelModal(booking.bookingId)}
                           disabled={loading}
                           className="action-btn action-btn--danger"
                         >
-                          {loading ? 'Cancelling...' : 'Cancel Booking'}
+                          Cancel Booking
                         </button>
                       )}
                     </div>
@@ -270,6 +285,63 @@ const BookingsPage = () => {
           </div>
         )}
       </div>
+
+      <Modal
+        opened={cancelModalOpen}
+        onClose={closeCancelModal}
+        title={
+          <div className="modal-title-custom">
+            <span className="modal-title-icon">⚠️</span>
+            <span>Cancel Booking</span>
+          </div>
+        }
+        centered
+        size="md"
+        overlayProps={{ blur: 3 }}
+        classNames={{
+          modal: 'modal-custom',
+          header: 'modal-header-custom',
+          body: 'modal-body-custom',
+        }}
+      >
+        <Stack spacing="md">
+          <Alert
+            icon="⚠️"
+            title="Are you sure?"
+            color="orange"
+            variant="light"
+            className="alert-warning-custom"
+          >
+            <Text size="sm">
+              This action cannot be undone. Once cancelled, you will need to make a new booking if you wish to travel on this flight.
+            </Text>
+          </Alert>
+
+          <div className="booking-id-display">
+            Booking ID: <span className="booking-id-value">{bookingToCancel}</span>
+          </div>
+
+          <div className="modal-button-group">
+            <Button
+              variant="outline"
+              color="gray"
+              onClick={closeCancelModal}
+              disabled={cancelling}
+              className="modal-button-cancel"
+            >
+              ❌ Keep Booking
+            </Button>
+            <Button
+              color="red"
+              onClick={handleCancelBooking}
+              loading={cancelling}
+              className="modal-button-confirm"
+            >
+              {cancelling ? 'Cancelling...' : '✅ Yes, Cancel Booking'}
+            </Button>
+          </div>
+        </Stack>
+      </Modal>
     </div>
   );
 };

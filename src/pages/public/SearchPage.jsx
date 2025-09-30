@@ -668,7 +668,7 @@ const SearchPage = () => {
             ) : (
               <div className="results-list">
                 {results.map((flight) => (
-            <Link key={flight.id} to={`/flight/${flight.id}?passengers=${passengers}`} className="flight-card">
+            <div key={flight.id} className="flight-card">
               <div className="flight-card-content">
                 <div className="flight-info">
                   <div className="flight-number">{flight.flightNumber || 'Flight'}</div>
@@ -707,9 +707,25 @@ const SearchPage = () => {
                     })()}
                   </div>
                 </div>
-                <div className="flight-price">€{Number(flight.price || 0).toFixed(2)}</div>
+                <div className="return-flight-details">
+                  <div className="return-flight-time">
+                    {(() => {
+                      const dt = flight.departureTime || flight.departureDate;
+                      return dt ? formatTime(dt) : '';
+                    })()}
+                  </div>
+                  <div className="return-flight-price">
+                    €{Number(flight.price || 0).toFixed(2)}
+                  </div>
+                  <Link
+                    to={`/flight/${flight.id}?passengers=${passengers}`}
+                    className="view-details-button"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </div>
-            </Link>
+            </div>
                 ))}
               </div>
             )}

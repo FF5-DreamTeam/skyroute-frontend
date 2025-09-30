@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 import { useNavigate, useLocation } from 'react-router-dom';
 import backgroundImg from '../../assets/images/background-img.jpg';
 import { API_ENDPOINTS } from '../../config/api';
@@ -454,26 +456,40 @@ const HeroSearch = () => {
                     <label className="hero-search__form-label">
                       Outbound
                     </label>
-                    <input
-                      type="date"
-                      name="outbound"
-                      value={searchData.outbound}
-                      onChange={handleInputChange}
-                      className="hero-search__form-input"
+                    <DatePickerInput
+                      value={searchData.outbound ? dayjs(searchData.outbound).toDate() : null}
+                      onChange={(date) => {
+                        const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                        setSearchData(prev => ({ ...prev, outbound: value }));
+                      }}
+                      placeholder="Select date"
+                      valueFormat="DD/MM/YYYY"
+                      dropdownType="popover"
+                      popoverProps={{ withinPortal: true, position: 'bottom-start', offset: 8, zIndex: 3000 }}
+                      clearable
                       required
+                      minDate={new Date()}
+                      classNames={{ input: 'hero-date-input' }}
                     />
                   </div>
                   <div className="hero-search__form-group">
                     <label className="hero-search__form-label">
                       Return
                     </label>
-                    <input
-                      type="date"
-                      name="return"
-                      value={searchData.return}
-                      onChange={handleInputChange}
-                      className={`hero-search__form-input ${tripType === 'one-way' ? 'hero-search__form-input--disabled' : ''}`}
+                    <DatePickerInput
+                      value={searchData.return ? dayjs(searchData.return).toDate() : null}
+                      onChange={(date) => {
+                        const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                        setSearchData(prev => ({ ...prev, return: value }));
+                      }}
+                      placeholder="Select date"
+                      valueFormat="DD/MM/YYYY"
+                      dropdownType="popover"
+                      popoverProps={{ withinPortal: true, position: 'bottom-start', offset: 8, zIndex: 3000 }}
+                      clearable
+                      minDate={searchData.outbound ? dayjs(searchData.outbound).toDate() : new Date()}
                       disabled={tripType === 'one-way'}
+                      classNames={{ input: 'hero-date-input' }}
                     />
                   </div>
                 </div>

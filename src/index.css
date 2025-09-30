@@ -1,2 +1,6 @@
+@import "@mantine/core/styles.css";
+@import "@mantine/dates/styles.css";
+@import "sonner/dist/styles.css";
 @import "./styles/variables.css";
 @import "./styles/base.css";
+@import "./styles/modals.css";

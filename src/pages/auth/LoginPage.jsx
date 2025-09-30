@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 import { API_ENDPOINTS } from '../../config/api';
 import './AuthPages.css';
 
@@ -11,7 +12,6 @@ const LoginPage = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +24,6 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
@@ -39,7 +38,7 @@ const LoginPage = () => {
       try {
         data = await response.json();
       } catch (jsonError) {
-        setError('Invalid response from server');
+        toast.error('Invalid response from server');
         return;
       }
 
@@ -85,12 +84,13 @@ const LoginPage = () => {
         }
         const params = new URLSearchParams(location.search);
         const redirect = params.get('redirect');
+        toast.success('Login successful!');
         navigate(redirect || '/profile');
       } else {
-        setError(data.message || 'Login failed');
+        toast.error(data.message || 'Login failed');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -131,11 +131,6 @@ const LoginPage = () => {
               />
             </div>
 
-            {error && (
-              <div className="auth-error">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
