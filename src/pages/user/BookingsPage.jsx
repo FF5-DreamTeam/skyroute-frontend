@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal, Button, Text, Stack, Alert } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { toast } from 'sonner';
+import dayjs from 'dayjs';
 import { API_ENDPOINTS, getAuthHeaders } from '../../config/api';
 import './BookingsPage.css';
+import './BookingsPageFilters.css';
 
 const BookingsPage = () => {
   const navigate = useNavigate();
+  const [allBookings, setAllBookings] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,7 +20,19 @@ const BookingsPage = () => {
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [cancelling, setCancelling] = useState(false);
 
-  const fetchBookings = useCallback(async () => {
+  const [filters, setFilters] = useState({
+    status: [],
+    minPrice: '',
+    maxPrice: '',
+    dateFrom: '',
+    dateTo: ''
+  });
+  
+  const [sortBy, setSortBy] = useState('bookingId');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [totalResults, setTotalResults] = useState(0);
+
+  const fetchAllBookings = useCallback(async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
@@ -25,37 +41,184 @@ const BookingsPage = () => {
 
     try {
       setLoading(true);
-      const response = await fetch(
-        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=${currentPage}&size=10`,
+      
+      let response = await fetch(
+        `${API_ENDPOINTS.BOOKINGS.USER_BOOKINGS}?page=0&size=100`,
         {
           headers: getAuthHeaders(token)
         }
       );
+      
+      if (!response.ok) {
+        response = await fetch(
+          API_ENDPOINTS.BOOKINGS.USER_BOOKINGS,
+          {
+            headers: getAuthHeaders(token)
+          }
+        );
+      }
 
       if (response.ok) {
         const data = await response.json();
-        
-        const sortedBookings = data.content.sort((a, b) => {
-          return (b.bookingId || b.id || 0) - (a.bookingId || a.id || 0);
-        });
-        
-        console.log('Booking IDs after sorting:', sortedBookings.map(b => b.bookingId || b.id));
-        
-        setBookings(sortedBookings);
-        setTotalPages(data.totalPages);
+        if (Array.isArray(data)) {
+          setAllBookings(data);
+        } else if (data.content && Array.isArray(data.content)) {
+          setAllBookings(data.content);
+        } else {
+          setAllBookings([]);
+        }
       } else {
-        setError('Failed to fetch current bookings');
+        console.error('Failed to fetch bookings:', response.status, response.statusText);
+        if (response.status === 401) {
+          navigate('/login');
+          return;
+        }
+        setError(`Failed to fetch current bookings (${response.status})`);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      console.error('Error fetching bookings:', err);
+      setError(`Network error: ${err.message}`);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, navigate]);
+  }, [navigate]);
+
+  const applyFiltersAndSort = useCallback(() => {
+    if (!Array.isArray(allBookings)) {
+      setBookings([]);
+      setTotalPages(0);
+      setTotalResults(0);
+      return;
+    }
+    
+    
+    let filteredBookings = allBookings.filter(booking => {
+      if (filters.status.length > 0 && !filters.status.includes(booking.bookingStatus)) {
+        return false;
+      }
+      
+      if (filters.minPrice && booking.totalPrice < parseFloat(filters.minPrice)) {
+        return false;
+      }
+      
+      if (filters.maxPrice && booking.totalPrice > parseFloat(filters.maxPrice)) {
+        return false;
+      }
+      
+      if (filters.dateFrom) {
+        if (!booking.createdAt) return false;
+        const bookingDate = new Date(booking.createdAt);
+        const fromDate = new Date(filters.dateFrom);
+        if (bookingDate < fromDate) {
+          return false;
+        }
+      }
+      
+      if (filters.dateTo) {
+        if (!booking.createdAt) return false;
+        const bookingDate = new Date(booking.createdAt);
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (bookingDate > toDate) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    filteredBookings.sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortBy) {
+        case 'createdAt':
+          if (a.createdAt && b.createdAt) {
+            aValue = new Date(a.createdAt);
+            bValue = new Date(b.createdAt);
+          } else {
+            aValue = a.bookingId || 0;
+            bValue = b.bookingId || 0;
+          }
+          break;
+        case 'bookingId':
+          aValue = a.bookingId || 0;
+          bValue = b.bookingId || 0;
+          break;
+        case 'totalPrice':
+          aValue = parseFloat(a.totalPrice || 0);
+          bValue = parseFloat(b.totalPrice || 0);
+          break;
+        case 'departureTime':
+          aValue = a.departureTime ? new Date(a.departureTime) : new Date(0);
+          bValue = b.departureTime ? new Date(b.departureTime) : new Date(0);
+          break;
+        case 'bookingStatus':
+          aValue = (a.bookingStatus || '').toLowerCase();
+          bValue = (b.bookingStatus || '').toLowerCase();
+          break;
+        default:
+          aValue = a.bookingId || 0;
+          bValue = b.bookingId || 0;
+      }
+      
+      const result = sortOrder === 'asc' ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
+      return result;
+    });
+    
+    const startIndex = currentPage * 10;
+    const endIndex = startIndex + 10;
+    const paginatedBookings = filteredBookings.slice(startIndex, endIndex);
+    
+    setBookings(paginatedBookings);
+    setTotalPages(Math.ceil(filteredBookings.length / 10));
+    setTotalResults(filteredBookings.length);
+  }, [allBookings, filters, sortBy, sortOrder, currentPage]);
 
   useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+    fetchAllBookings();
+  }, [fetchAllBookings]);
+
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [applyFiltersAndSort, allBookings]);
+
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+    setCurrentPage(0);
+  };
+
+  const handleStatusFilterChange = (status) => {
+    setFilters(prev => ({
+      ...prev,
+      status: prev.status.includes(status)
+        ? prev.status.filter(s => s !== status)
+        : [...prev.status, status]
+    }));
+    setCurrentPage(0);
+  };
+
+
+  const clearFilters = () => {
+    setFilters({
+      status: [],
+      minPrice: '',
+      maxPrice: '',
+      dateFrom: '',
+      dateTo: ''
+    });
+    setCurrentPage(0);
+  };
+
+  const hasActiveFilters = () => {
+    return filters.status.length > 0 || 
+           filters.minPrice || 
+           filters.maxPrice || 
+           filters.dateFrom || 
+           filters.dateTo;
+  };
 
   const openCancelModal = (bookingId) => {
     setBookingToCancel(bookingId);
@@ -87,7 +250,7 @@ const BookingsPage = () => {
 
       if (response.status === 204) {
         toast.success('Booking cancelled successfully!');
-        fetchBookings();
+        fetchAllBookings();
         closeCancelModal();
       } else if (response.status === 400) {
         toast.error('Invalid status transition - booking cannot be cancelled');
@@ -158,10 +321,121 @@ const BookingsPage = () => {
 
   return (
     <div className="bookings-page">
-      <div className="bookings-container">
-        <div className="bookings-header">
-          <h1 className="bookings-title">My Bookings</h1>
-          <p className="bookings-subtitle">All your flight bookings (newest first)</p>
+      <div className="bookings-page-with-filters">
+        <div className="bookings-filters">
+          <h2 className="bookings-filters__title">Filters</h2>
+          
+          <div className="bookings-filters__section">
+            <h3 className="bookings-filters__section-title">Status</h3>
+            <div className="bookings-filters__checkbox-group">
+              {['CONFIRMED', 'CREATED', 'CANCELLED'].map(status => (
+                <div key={status} className="bookings-filters__checkbox-item">
+                  <input
+                    type="checkbox"
+                    id={`status-${status}`}
+                    className="bookings-filters__checkbox"
+                    checked={filters.status.includes(status)}
+                    onChange={() => handleStatusFilterChange(status)}
+                  />
+                  <label htmlFor={`status-${status}`} className="bookings-filters__checkbox-label">
+                    {status}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bookings-filters__section">
+            <h3 className="bookings-filters__section-title">Price Range (€)</h3>
+            <div className="bookings-filters__price-range">
+              <div className="bookings-filters__price-inputs">
+                <input
+                  type="number"
+                  placeholder="Min price (€)"
+                  className="bookings-filters__price-input"
+                  value={filters.minPrice}
+                  onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Max price (€)"
+                  className="bookings-filters__price-input"
+                  value={filters.maxPrice}
+                  onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="bookings-filters__section">
+            <h3 className="bookings-filters__section-title">Date Range</h3>
+            <div className="bookings-filters__date-inputs">
+              <DatePickerInput
+                placeholder="From date"
+                value={filters.dateFrom ? dayjs(filters.dateFrom).toDate() : null}
+                onChange={(date) => {
+                  const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                  handleFilterChange('dateFrom', value);
+                }}
+                clearable
+                classNames={{ input: 'bookings-filters__date-input' }}
+              />
+              <DatePickerInput
+                placeholder="To date"
+                value={filters.dateTo ? dayjs(filters.dateTo).toDate() : null}
+                onChange={(date) => {
+                  const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                  handleFilterChange('dateTo', value);
+                }}
+                clearable
+                classNames={{ input: 'bookings-filters__date-input' }}
+              />
+            </div>
+          </div>
+
+          {hasActiveFilters() && (
+            <button
+              onClick={clearFilters}
+              className="bookings-filters__clear-btn"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
+
+        <div className="bookings-content-with-filters">
+          <div className="bookings-sort-controls">
+            <div className="bookings-sort-controls__left">
+              <span className="bookings-sort-controls__label">Sort by:</span>
+              <select
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [newSortBy, newSortOrder] = e.target.value.split('-');
+                  setSortBy(newSortBy);
+                  setSortOrder(newSortOrder);
+                  setCurrentPage(0);
+                }}
+                className="bookings-sort-controls__select"
+              >
+                <option value="bookingId-desc">Booking (Newest)</option>
+                <option value="bookingId-asc">Booking (Oldest)</option>
+                <option value="createdAt-desc">Flight Date (Latest)</option>
+                <option value="createdAt-asc">Flight Date (Earliest)</option>
+                <option value="totalPrice-desc">Price (High to Low)</option>
+                <option value="totalPrice-asc">Price (Low to High)</option>
+                <option value="departureTime-desc">Departure (Latest)</option>
+                <option value="departureTime-asc">Departure (Earliest)</option>
+                <option value="bookingStatus-asc">Status (A-Z)</option>
+                <option value="bookingStatus-desc">Status (Z-A)</option>
+              </select>
+            </div>
+            <div className="bookings-sort-controls__right">
+              <span>{totalResults} booking{totalResults !== 1 ? 's' : ''} found</span>
+            </div>
+          </div>
+
+          <div className="bookings-results-count">
+            Showing <span className="bookings-results-count__number">{bookings.length}</span> of {totalResults} bookings
         </div>
 
         {error && (
@@ -290,6 +564,7 @@ const BookingsPage = () => {
             )}
           </div>
         )}
+        </div>
       </div>
 
       <Modal
