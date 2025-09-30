@@ -72,11 +72,22 @@
 
 .hero-search__extra-row {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-search__extra-row:last-of-type {
+  margin-bottom: 0;
 }
 
 .hero-search__extra-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hero-search__extra-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -102,6 +113,7 @@
   padding: 0 1rem;
   font-weight: 700;
   cursor: pointer;
+  height: 3rem;
 }
 
 .hero-search__title {
@@ -206,6 +218,18 @@
   border-radius: 12px !important;
   height: 48px !important;
   font-family: var(--font-body) !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.hero-date-input::placeholder {
+  text-align: center !important;
+}
+
+.hero-date-input .mantine-Input-input {
+  text-align: center !important;
 }
 
 .hero-search__form-input[type="date"]::-webkit-datetime-edit-text {
@@ -229,6 +253,57 @@
   color: var(--color-text-2);
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.hero-search__passenger-selector {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-background-3);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.hero-search__passenger-selector:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+.hero-search__passenger-btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 1.1rem 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+}
+
+.hero-search__passenger-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.hero-search__passenger-btn:disabled {
+  background-color: var(--color-background-2);
+  color: var(--color-text-2);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.hero-search__passenger-display {
+  flex: 1;
+  padding: 1.1rem 1.25rem;
+  text-align: center;
+  color: var(--color-accent-2);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  background-color: var(--color-background);
 }
 
 .hero-search__toggle {

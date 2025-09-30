@@ -70,27 +70,19 @@ const SearchPage = () => {
         setLoading(true);
         setError(null);
 
-        if (budget) {
-          const query = buildQueryString({ page, size: 10 });
-          const res = await fetch(`${API_ENDPOINTS.FLIGHTS.PUBLIC.BUDGET}?${query}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ budget: Number(budget) })
-          });
+        if (budget || city || origin) {
+          const queryParams = { page, size: 10 };
+          if (budget) queryParams.budget = Number(budget);
+          if (city) queryParams.destination = city.trim();
+          if (origin) queryParams.origin = origin.trim();
+          
+          const query = buildQueryString(queryParams);
+          const res = await fetch(`${API_ENDPOINTS.FLIGHTS.PUBLIC.SEARCH_FILTERS}?${query}`);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           const content = Array.isArray(data?.content) ? data.content : [];
           setResults(content);
           setTotalPages(typeof data.totalPages === 'number' ? data.totalPages : 1);
-          return;
-        }
-
-        if (city) {
-          const res = await fetch(API_ENDPOINTS.FLIGHTS.PUBLIC.BY_CITY(city));
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          setResults(Array.isArray(data) ? data : []);
-          setTotalPages(1);
           return;
         }
 

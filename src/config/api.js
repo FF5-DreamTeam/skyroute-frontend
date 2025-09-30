@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
     // Public endpoints
     PUBLIC: {
       SEARCH: `${API_BASE_URL}/api/flights/search`,
+      SEARCH_FILTERS: `${API_BASE_URL}/api/flights/search-filters`,
       BUDGET: `${API_BASE_URL}/api/flights/budget`,
       BY_ID: (id) => `${API_BASE_URL}/api/flights/${id}`,
       BY_CITY: (city) => `${API_BASE_URL}/api/flights/city/${encodeURIComponent(city)}`,

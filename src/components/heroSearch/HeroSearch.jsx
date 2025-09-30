@@ -19,10 +19,17 @@ const HeroSearch = () => {
   const [tripType, setTripType] = useState('one-way');
   const [extraBudget, setExtraBudget] = useState('');
   const [extraCity, setExtraCity] = useState('');
+  const [extraOrigin, setExtraOrigin] = useState('');
+  const [showExtraFromDropdown, setShowExtraFromDropdown] = useState(false);
+  const [showExtraToDropdown, setShowExtraToDropdown] = useState(false);
+  const [extraFromSearch, setExtraFromSearch] = useState('');
+  const [extraToSearch, setExtraToSearch] = useState('');
   
   const [airports, setAirports] = useState([]);
   const [filteredFromAirports, setFilteredFromAirports] = useState([]);
   const [filteredToAirports, setFilteredToAirports] = useState([]);
+  const [filteredExtraFromAirports, setFilteredExtraFromAirports] = useState([]);
+  const [filteredExtraToAirports, setFilteredExtraToAirports] = useState([]);
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [fromSearch, setFromSearch] = useState('');
@@ -83,6 +90,8 @@ const HeroSearch = () => {
         setAirports(validAirports);
         setFilteredFromAirports(validAirports);
         setFilteredToAirports(validAirports);
+        setFilteredExtraFromAirports(validAirports);
+        setFilteredExtraToAirports(validAirports);
       } catch (error) {
         console.error('Error fetching airports:', error);
         setError(error.message);
@@ -101,6 +110,8 @@ const HeroSearch = () => {
         setAirports(fallbackAirports);
         setFilteredFromAirports(fallbackAirports);
         setFilteredToAirports(fallbackAirports);
+        setFilteredExtraFromAirports(fallbackAirports);
+        setFilteredExtraToAirports(fallbackAirports);
       } finally {
         setLoading(false);
       }
@@ -179,13 +190,37 @@ const HeroSearch = () => {
     }
   }, [toSearch, airports]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setSearchData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  useEffect(() => {
+    if (extraFromSearch && extraFromSearch.trim() !== '') {
+      const filtered = airports.filter(airport => 
+        airport && 
+        airport.city && 
+        airport.code &&
+        (airport.city.toLowerCase().includes(extraFromSearch.toLowerCase()) ||
+         airport.code.toLowerCase().includes(extraFromSearch.toLowerCase()) ||
+         (airport.name && airport.name.toLowerCase().includes(extraFromSearch.toLowerCase())))
+      );
+      setFilteredExtraFromAirports(filtered);
+    } else {
+      setFilteredExtraFromAirports(airports);
+    }
+  }, [extraFromSearch, airports]);
+
+  useEffect(() => {
+    if (extraToSearch && extraToSearch.trim() !== '') {
+      const filtered = airports.filter(airport => 
+        airport && 
+        airport.city && 
+        airport.code &&
+        (airport.city.toLowerCase().includes(extraToSearch.toLowerCase()) ||
+         airport.code.toLowerCase().includes(extraToSearch.toLowerCase()) ||
+         (airport.name && airport.name.toLowerCase().includes(extraToSearch.toLowerCase())))
+      );
+      setFilteredExtraToAirports(filtered);
+    } else {
+      setFilteredExtraToAirports(airports);
+    }
+  }, [extraToSearch, airports]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -261,11 +296,56 @@ const HeroSearch = () => {
     setShowToDropdown(true);
   };
 
+  const handleExtraFromInputChange = (e) => {
+    const value = e.target.value;
+    setExtraFromSearch(value);
+    setExtraOrigin(value);
+    setShowExtraFromDropdown(true);
+  };
+
+  const handleExtraToInputChange = (e) => {
+    const value = e.target.value;
+    setExtraToSearch(value);
+    setExtraCity(value);
+    setShowExtraToDropdown(true);
+  };
+
+  const selectExtraAirport = (airport, type) => {
+    if (!airport || !airport.city || !airport.code) {
+      return;
+    }
+    
+    const displayText = `${airport.city} (${airport.code})`;
+    if (type === 'from') {
+      setExtraOrigin(displayText);
+      setExtraFromSearch(displayText);
+      setShowExtraFromDropdown(false);
+    } else {
+      setExtraCity(displayText);
+      setExtraToSearch(displayText);
+      setShowExtraToDropdown(false);
+    }
+  };
+
+  const handleExtraFromFocus = () => {
+    setExtraFromSearch('');
+    setExtraOrigin('');
+    setShowExtraFromDropdown(true);
+  };
+
+  const handleExtraToFocus = () => {
+    setExtraToSearch('');
+    setExtraCity('');
+    setShowExtraToDropdown(true);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.hero-search__dropdown-container')) {
         setShowFromDropdown(false);
         setShowToDropdown(false);
+        setShowExtraFromDropdown(false);
+        setShowExtraToDropdown(false);
       }
     };
 
@@ -295,21 +375,117 @@ const HeroSearch = () => {
 
             <div className="hero-search__extra-card">
               <div className="hero-search__extra-title">Additional search</div>
-              <div className="hero-search__extra-row">
-                <form
-                  className="hero-search__extra-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const budgetNum = extraBudget ? Number(extraBudget) : null;
-                    const search = new URLSearchParams();
-                    if (budgetNum !== null && !Number.isNaN(budgetNum)) {
-                      search.append('budget', String(budgetNum));
-                    }
-                    navigate(`/search?${search.toString()}`);
-                  }}
-                >
-                  <label className="hero-search__extra-label">By budget (€)</label>
-                  <div className="hero-search__extra-controls">
+              <form
+                className="hero-search__extra-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const budgetNum = extraBudget ? Number(extraBudget) : null;
+                  const search = new URLSearchParams();
+                  if (budgetNum !== null && !Number.isNaN(budgetNum)) {
+                    search.append('budget', String(budgetNum));
+                  }
+                  if (extraCity && extraCity.trim()) {
+                    search.append('city', extraCity.trim());
+                  }
+                  if (extraOrigin && extraOrigin.trim()) {
+                    search.append('origin', extraOrigin.trim());
+                  }
+                  navigate(`/search?${search.toString()}`);
+                }}
+              >
+                <div className="hero-search__extra-row">
+                  <div className="hero-search__extra-group">
+                    <label className="hero-search__extra-label">From city</label>
+                    <div className="hero-search__dropdown-container">
+                      <input
+                        type="text"
+                        placeholder="e.g. London"
+                        value={extraFromSearch}
+                        onChange={handleExtraFromInputChange}
+                        onFocus={handleExtraFromFocus}
+                        className="hero-search__form-input"
+                        autoComplete="off"
+                      />
+                      {showExtraFromDropdown && (
+                        <div className="hero-search__dropdown">
+                          {loading ? (
+                            <div className="hero-search__dropdown-loading">
+                              Loading airports...
+                            </div>
+                          ) : filteredExtraFromAirports.length > 0 ? (
+                            filteredExtraFromAirports
+                              .filter(airport => airport && airport.id && airport.city && airport.code)
+                              .map((airport) => (
+                                <div
+                                  key={airport.id}
+                                  className="hero-search__dropdown-item"
+                                  onClick={() => selectExtraAirport(airport, 'from')}
+                                >
+                                  <div className="hero-search__dropdown-city">
+                                    {airport.city}
+                                  </div>
+                                  <div className="hero-search__dropdown-code">
+                                    {airport.code}
+                                  </div>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="hero-search__dropdown-loading">
+                              No airports found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="hero-search__extra-group">
+                    <label className="hero-search__extra-label">To city</label>
+                    <div className="hero-search__dropdown-container">
+                      <input
+                        type="text"
+                        placeholder="e.g. Madrid"
+                        value={extraToSearch}
+                        onChange={handleExtraToInputChange}
+                        onFocus={handleExtraToFocus}
+                        className="hero-search__form-input"
+                        autoComplete="off"
+                      />
+                      {showExtraToDropdown && (
+                        <div className="hero-search__dropdown">
+                          {loading ? (
+                            <div className="hero-search__dropdown-loading">
+                              Loading airports...
+                            </div>
+                          ) : filteredExtraToAirports.length > 0 ? (
+                            filteredExtraToAirports
+                              .filter(airport => airport && airport.id && airport.city && airport.code)
+                              .map((airport) => (
+                                <div
+                                  key={airport.id}
+                                  className="hero-search__dropdown-item"
+                                  onClick={() => selectExtraAirport(airport, 'to')}
+                                >
+                                  <div className="hero-search__dropdown-city">
+                                    {airport.city}
+                                  </div>
+                                  <div className="hero-search__dropdown-code">
+                                    {airport.code}
+                                  </div>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="hero-search__dropdown-loading">
+                              No airports found
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="hero-search__extra-row">
+                  <div className="hero-search__extra-group">
+                    <label className="hero-search__extra-label">Max budget (€)</label>
                     <input
                       type="number"
                       min="0"
@@ -318,34 +494,14 @@ const HeroSearch = () => {
                       onChange={(e) => setExtraBudget(e.target.value)}
                       className="hero-search__form-input"
                     />
+                  </div>
+                </div>
+                <div className="hero-search__extra-row">
+                  <div className="hero-search__extra-group">
                     <button type="submit" className="hero-search__extra-button">Search</button>
                   </div>
-                </form>
-
-                <form
-                  className="hero-search__extra-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const search = new URLSearchParams();
-                    if (extraCity && extraCity.trim()) {
-                      search.append('city', extraCity.trim());
-                    }
-                    navigate(`/search?${search.toString()}`);
-                  }}
-                >
-                  <label className="hero-search__extra-label">By destination city</label>
-                  <div className="hero-search__extra-controls">
-                    <input
-                      type="text"
-                      placeholder="e.g. Madrid"
-                      value={extraCity}
-                      onChange={(e) => setExtraCity(e.target.value)}
-                      className="hero-search__form-input"
-                    />
-                    <button type="submit" className="hero-search__extra-button">Search</button>
-                  </div>
-                </form>
-              </div>
+                </div>
+              </form>
             </div>
           </div>
           
@@ -518,18 +674,35 @@ const HeroSearch = () => {
                   <label className="hero-search__form-label">
                     Number of passengers
                   </label>
-                  <select
-                    name="passengers"
-                    value={searchData.passengers}
-                    onChange={handleInputChange}
-                    className="hero-search__form-input"
-                  >
-                    {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? 'passenger' : 'passengers'}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="hero-search__passenger-selector">
+                    <button
+                      type="button"
+                      className="hero-search__passenger-btn hero-search__passenger-btn--minus"
+                      onClick={() => {
+                        if (searchData.passengers > 1) {
+                          setSearchData(prev => ({ ...prev, passengers: prev.passengers - 1 }));
+                        }
+                      }}
+                      disabled={searchData.passengers <= 1}
+                    >
+                      −
+                    </button>
+                    <div className="hero-search__passenger-display">
+                      {searchData.passengers} {searchData.passengers === 1 ? 'passenger' : 'passengers'}
+                    </div>
+                    <button
+                      type="button"
+                      className="hero-search__passenger-btn hero-search__passenger-btn--plus"
+                      onClick={() => {
+                        if (searchData.passengers < 10) {
+                          setSearchData(prev => ({ ...prev, passengers: prev.passengers + 1 }));
+                        }
+                      }}
+                      disabled={searchData.passengers >= 10}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
                 
                 <button
