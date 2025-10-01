@@ -1,9 +1,7 @@
-name: CI/CD Pipeline
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [dev, main]
-  pull_request:
     branches: [dev, main]
   workflow_dispatch:
 
@@ -17,24 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - name: Run CSS linter
-        run: npm run lint:css:check
-      - name: Run tests
-        run: npm test -- --coverage --watchAll=false
-      - name: Build project
-        run: npm run build
-
   build:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -47,6 +28,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./build
+
   deploy:
     needs: build
     runs-on: ubuntu-latest

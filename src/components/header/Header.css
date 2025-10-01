@@ -197,7 +197,7 @@
   background-color: white;
   border-top: 1px solid #e5e7eb;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  animation: slideDown 0.3s ease-out;
+  animation: slide-down 0.3s ease-out;
 }
 
 @media (min-width: 768px) {
@@ -206,11 +206,12 @@
   }
 }
 
-@keyframes slideDown {
+@keyframes slide-down {
   from {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
