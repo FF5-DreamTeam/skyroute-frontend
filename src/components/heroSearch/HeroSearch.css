@@ -9,6 +9,18 @@
   padding: 2rem 0;
 }
 
+@media (min-width: 640px) {
+  .hero-search {
+    min-height: 100vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-search {
+    min-height: 100vh;
+  }
+}
+
 @media (min-width: 1024px) {
   .hero-search {
     height: 40vh;
@@ -67,6 +79,18 @@
   opacity: 1;
   border-radius: 1.5rem;
   z-index: 1;
+}
+
+@media (min-width: 340px) {
+  .hero-search__background {
+    height: 45%;
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-search__background {
+    height: 48%;
+  }
 }
 
 @media (min-width: 768px) {
@@ -173,7 +197,6 @@
   }
 }
 
-/* Extra Search Card */
 .hero-search__extra-card {
   background-color: rgb(255 255 255 / 95%);
   border-radius: 1rem;
@@ -259,7 +282,6 @@
   transform: translateY(-1px);
 }
 
-/* Main Search Form */
 .hero-search__form-container {
   max-width: 28rem;
   width: 100%;
@@ -344,7 +366,6 @@
   box-shadow: 0 0 0 3px rgb(187 216 216 / 10%);
 }
 
-/* Mantine DatePicker Overrides */
 .hero-date-input {
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
@@ -381,7 +402,6 @@
   opacity: 0.7;
 }
 
-/* Passenger Selector */
 .hero-search__passenger-selector {
   display: flex;
   align-items: center;
@@ -439,7 +459,6 @@
   justify-content: center;
 }
 
-/* Trip Type Toggle */
 .hero-search__toggle {
   display: flex;
   background-color: var(--color-background-2);
@@ -467,7 +486,6 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
-/* Dropdown */
 .hero-search__dropdown-container {
   position: relative;
   width: 100%;
@@ -529,7 +547,6 @@
   font-style: italic;
 }
 
-/* Submit Button */
 .hero-search__form-button {
   width: 100%;
   background-color: var(--color-accent-3);
@@ -560,7 +577,6 @@
   box-shadow: 0 10px 20px rgb(247 163 79 / 30%);
 }
 
-/* Mobile Specific Adjustments */
 @media (max-width: 639px) {
   .hero-search {
     min-height: 100vh;
@@ -604,7 +620,6 @@
   }
 }
 
-/* Tablet Adjustments */
 @media (min-width: 640px) and (max-width: 1023px) {
   .hero-search {
     min-height: 80vh;
@@ -615,14 +630,12 @@
   }
 }
 
-/* Desktop Adjustments */
 @media (min-width: 1024px) {
   .hero-search {
     min-height: 85vh;
   }
 }
 
-/* Landscape Orientation */
 @media (max-height: 600px) and (orientation: landscape) {
   .hero-search {
     min-height: 100vh;
