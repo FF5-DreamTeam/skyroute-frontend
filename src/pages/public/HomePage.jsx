@@ -5,6 +5,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white">
       <HeroSearch />
+      <div className="section-spacer"></div>
       <PopularDestinations />
       <Footer />
     </div>

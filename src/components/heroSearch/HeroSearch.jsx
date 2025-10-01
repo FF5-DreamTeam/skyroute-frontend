@@ -93,7 +93,6 @@ const HeroSearch = () => {
         setFilteredExtraFromAirports(validAirports);
         setFilteredExtraToAirports(validAirports);
       } catch (error) {
-        console.error('Error fetching airports:', error);
         setError(error.message);
         const fallbackAirports = [
           { id: 1, city: 'Madrid', code: 'MAD', name: 'Madrid-Barajas Airport' },
@@ -366,13 +365,14 @@ const HeroSearch = () => {
         />
         <div className="hero-search__content">
           <div className="hero-search__text">
-            <h1 className="hero-search__title">
-              WHERE DREAMS
-            </h1>
-            <h2 className="hero-search__subtitle">
-              BECOME DESTINATION!
-            </h2>
-
+            <div className="hero-search__text-container">
+              <h1 className="hero-search__title">
+                WHERE DREAMS
+              </h1>
+              <h2 className="hero-search__subtitle">
+                BECOME DESTINATION!
+              </h2>
+            </div>
             <div className="hero-search__extra-card">
               <div className="hero-search__extra-title">Additional search</div>
               <form
