@@ -31,6 +31,8 @@ const BookingsPage = () => {
   const [sortBy, setSortBy] = useState('bookingId');
   const [sortOrder, setSortOrder] = useState('desc');
   const [totalResults, setTotalResults] = useState(0);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  
 
   const fetchAllBookings = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -68,7 +70,6 @@ const BookingsPage = () => {
           setAllBookings([]);
         }
       } else {
-        console.error('Failed to fetch bookings:', response.status, response.statusText);
         if (response.status === 401) {
           navigate('/login');
           return;
@@ -76,7 +77,6 @@ const BookingsPage = () => {
         setError(`Failed to fetch current bookings (${response.status})`);
       }
     } catch (err) {
-      console.error('Error fetching bookings:', err);
       setError(`Network error: ${err.message}`);
     } finally {
       setLoading(false);
@@ -91,6 +91,8 @@ const BookingsPage = () => {
       return;
     }
     
+    if (allBookings.length > 0) {
+    }
     
     let filteredBookings = allBookings.filter(booking => {
       if (filters.status.length > 0 && !filters.status.includes(booking.bookingStatus)) {
@@ -127,19 +129,11 @@ const BookingsPage = () => {
       return true;
     });
     
+    
     filteredBookings.sort((a, b) => {
       let aValue, bValue;
       
       switch (sortBy) {
-        case 'createdAt':
-          if (a.createdAt && b.createdAt) {
-            aValue = new Date(a.createdAt);
-            bValue = new Date(b.createdAt);
-          } else {
-            aValue = a.bookingId || 0;
-            bValue = b.bookingId || 0;
-          }
-          break;
         case 'bookingId':
           aValue = a.bookingId || 0;
           bValue = b.bookingId || 0;
@@ -182,6 +176,19 @@ const BookingsPage = () => {
     applyFiltersAndSort();
   }, [applyFiltersAndSort, allBookings]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.bookings-sort-selector')) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
       ...prev,
@@ -198,6 +205,28 @@ const BookingsPage = () => {
         : [...prev.status, status]
     }));
     setCurrentPage(0);
+  };
+
+  const handleSortChange = (newSortBy, newSortOrder) => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setCurrentPage(0);
+    setShowSortDropdown(false);
+  };
+
+  const getSortDisplayText = (sortBy, sortOrder) => {
+    switch (sortBy) {
+      case 'bookingId':
+        return sortOrder === 'desc' ? 'Booking (Newest)' : 'Booking (Oldest)';
+      case 'departureTime':
+        return sortOrder === 'desc' ? 'Departure (Latest)' : 'Departure (Earliest)';
+      case 'totalPrice':
+        return sortOrder === 'desc' ? 'Price (High to Low)' : 'Price (Low to High)';
+      case 'bookingStatus':
+        return sortOrder === 'asc' ? 'Status (A-Z)' : 'Status (Z-A)';
+      default:
+        return 'Booking (Newest)';
+    }
   };
 
 
@@ -407,27 +436,74 @@ const BookingsPage = () => {
           <div className="bookings-sort-controls">
             <div className="bookings-sort-controls__left">
               <span className="bookings-sort-controls__label">Sort by:</span>
-              <select
-                value={`${sortBy}-${sortOrder}`}
-                onChange={(e) => {
-                  const [newSortBy, newSortOrder] = e.target.value.split('-');
-                  setSortBy(newSortBy);
-                  setSortOrder(newSortOrder);
-                  setCurrentPage(0);
-                }}
-                className="bookings-sort-controls__select"
-              >
-                <option value="bookingId-desc">Booking (Newest)</option>
-                <option value="bookingId-asc">Booking (Oldest)</option>
-                <option value="createdAt-desc">Flight Date (Latest)</option>
-                <option value="createdAt-asc">Flight Date (Earliest)</option>
-                <option value="totalPrice-desc">Price (High to Low)</option>
-                <option value="totalPrice-asc">Price (Low to High)</option>
-                <option value="departureTime-desc">Departure (Latest)</option>
-                <option value="departureTime-asc">Departure (Earliest)</option>
-                <option value="bookingStatus-asc">Status (A-Z)</option>
-                <option value="bookingStatus-desc">Status (Z-A)</option>
-              </select>
+              <div className="bookings-sort-selector">
+                <button
+                  type="button"
+                  className="bookings-sort-selector__button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowSortDropdown(!showSortDropdown);
+                  }}
+                >
+                  <span className="bookings-sort-selector__text">
+                    {getSortDisplayText(sortBy, sortOrder)}
+                  </span>
+                  <span className="bookings-sort-selector__arrow">▼</span>
+                </button>
+                {showSortDropdown && (
+                  <div className="bookings-sort-dropdown">
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('bookingId', 'desc')}
+                    >
+                      Booking (Newest)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('bookingId', 'asc')}
+                    >
+                      Booking (Oldest)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('departureTime', 'desc')}
+                    >
+                      Departure (Latest)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('departureTime', 'asc')}
+                    >
+                      Departure (Earliest)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('totalPrice', 'desc')}
+                    >
+                      Price (High to Low)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('totalPrice', 'asc')}
+                    >
+                      Price (Low to High)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('bookingStatus', 'asc')}
+                    >
+                      Status (A-Z)
+                    </div>
+                    <div
+                      className="bookings-sort-dropdown__item"
+                      onClick={() => handleSortChange('bookingStatus', 'desc')}
+                    >
+                      Status (Z-A)
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="bookings-sort-controls__right">
               <span>{totalResults} booking{totalResults !== 1 ? 's' : ''} found</span>

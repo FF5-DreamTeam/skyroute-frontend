@@ -84,8 +84,6 @@ export const getMinPricesForDestinations = async (destinations) => {
       throw new Error(`API returned ${response.status}`);
     }
   } catch (error) {
-    console.warn('Failed to fetch real prices, using fallback:', error.message);
-    
     
     return destinations.map(dest => ({
       ...dest,
@@ -105,7 +103,6 @@ export const getMinPriceForDestination = async (destinationCode, destinationCity
       throw new Error(`API returned ${response.status}`);
     }
   } catch (error) {
-    console.warn('Failed to fetch real price, using fallback:', error.message);
     return FALLBACK_PRICES[destinationCity] || 300;
   }
 };

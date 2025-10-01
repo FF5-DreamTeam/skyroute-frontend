@@ -45,7 +45,6 @@ const PopularDestinations = () => {
         
         setDestinations(destinationsWithPrices);
       } catch (error) {
-        console.error('Error fetching destinations:', error);
         setError(error.message);
         
         const fallbackDestinations = [

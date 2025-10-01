@@ -97,7 +97,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .modal-custom {
     margin: var(--spacing-md);
     max-width: calc(100vw - 2 * var(--spacing-md));

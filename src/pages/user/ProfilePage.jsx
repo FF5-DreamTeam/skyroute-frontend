@@ -57,7 +57,6 @@ const ProfilePage = () => {
       });
       setImagePreview(parsedUser.userImgUrl || defaultUserImg);
     } catch (error) {
-      console.error('Error parsing user data:', error);
       localStorage.removeItem('user');
       localStorage.removeItem('token');
       navigate('/login');

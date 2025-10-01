@@ -175,7 +175,6 @@ const FlightDetailsPage = () => {
           setAirportsMap(map);
         }
       } catch (err) {
-        console.error('Error loading airports:', err);
       }
     };
     loadAirports();
@@ -227,15 +226,6 @@ const FlightDetailsPage = () => {
     const allNamesPresent = names.length === passengers.length;
     const allDatesPresent = dates.length === passengers.length;
     
-        
-    console.log('Validation check:', {
-      passengers: passengers.length,
-      names: names.length,
-      dates: dates.length,
-      allNamesPresent,
-      allDatesPresent,
-      passengerData: passengers.map(p => ({ name: p.name, birthDate: p.birthDate }))
-    });
     
     if (!allNamesPresent || !allDatesPresent) {
       

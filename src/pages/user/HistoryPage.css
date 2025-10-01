@@ -88,11 +88,11 @@
   border-radius: 1rem;
   padding: 1.5rem;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .booking-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
   transform: translateY(-2px);
 }
 
@@ -307,7 +307,7 @@
   font-family: var(--font-body);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .history-container {
     padding: 0 0.5rem;
   }

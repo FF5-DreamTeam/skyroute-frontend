@@ -4,6 +4,32 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
+    screens: {
+      'xs': '475px',
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      '3xl': '1920px',
+    },
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2.5rem',
+        '2xl': '3rem',
+      },
+      screens: {
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1400px',
+      },
+    },
     extend: {
       colors: {
         main: {
@@ -83,6 +109,8 @@ module.exports = {
         'lg': '1.5rem',
         'xl': '2rem',
         '2xl': '3rem',
+        '3xl': '4rem',
+        '4xl': '6rem',
       },
       borderRadius: {
         'custom-sm': '0.25rem',
@@ -90,7 +118,103 @@ module.exports = {
         'custom-lg': '0.75rem',
         'custom-xl': '1rem',
       },
+      fontSize: {
+        'xs': ['0.75rem', { lineHeight: '1rem' }],
+        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+        'base': ['1rem', { lineHeight: '1.5rem' }],
+        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        '2xl': ['1.5rem', { lineHeight: '2rem' }],
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
+        '5xl': ['3rem', { lineHeight: '1' }],
+        '6xl': ['3.75rem', { lineHeight: '1' }],
+        '7xl': ['4.5rem', { lineHeight: '1' }],
+        '8xl': ['6rem', { lineHeight: '1' }],
+        '9xl': ['8rem', { lineHeight: '1' }],
+      },
+      minHeight: {
+        'screen-75': '75vh',
+        'screen-80': '80vh',
+        'screen-85': '85vh',
+        'screen-90': '90vh',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.text-responsive-xs': {
+          '@apply text-xs sm:text-sm': {},
+        },
+        '.text-responsive-sm': {
+          '@apply text-sm sm:text-base': {},
+        },
+        '.text-responsive-base': {
+          '@apply text-base sm:text-lg': {},
+        },
+        '.text-responsive-lg': {
+          '@apply text-lg sm:text-xl': {},
+        },
+        '.text-responsive-xl': {
+          '@apply text-xl sm:text-2xl': {},
+        },
+        '.text-responsive-2xl': {
+          '@apply text-2xl sm:text-3xl lg:text-4xl': {},
+        },
+        '.text-responsive-3xl': {
+          '@apply text-3xl sm:text-4xl lg:text-5xl': {},
+        },
+        '.text-responsive-4xl': {
+          '@apply text-4xl sm:text-5xl lg:text-6xl': {},
+        },
+        '.container-responsive': {
+          '@apply container mx-auto px-4 sm:px-6 lg:px-8': {},
+        },
+        '.grid-responsive': {
+          '@apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6': {},
+        },
+        '.grid-responsive-2': {
+          '@apply grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6': {},
+        },
+        '.grid-responsive-3': {
+          '@apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6': {},
+        },
+        '.flex-responsive': {
+          '@apply flex flex-col sm:flex-row gap-4 sm:gap-6': {},
+        },
+        '.card-responsive': {
+          '@apply bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6': {},
+        },
+        '.card-responsive-hover': {
+          '@apply card-responsive transition-all duration-200 hover:shadow-md hover:-translate-y-1': {},
+        },
+        '.btn-responsive': {
+          '@apply px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium rounded-lg transition-all duration-200': {},
+        },
+        '.input-responsive': {
+          '@apply w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent': {},
+        },
+        '.show-mobile': {
+          '@apply block sm:hidden': {},
+        },
+        '.show-tablet': {
+          '@apply hidden sm:block lg:hidden': {},
+        },
+        '.show-desktop': {
+          '@apply hidden lg:block': {},
+        },
+        '.hide-mobile': {
+          '@apply hidden sm:block': {},
+        },
+        '.hide-tablet': {
+          '@apply block sm:hidden lg:block': {},
+        },
+        '.hide-desktop': {
+          '@apply block lg:hidden': {},
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 }

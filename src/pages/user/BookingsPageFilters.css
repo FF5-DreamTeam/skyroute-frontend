@@ -1,40 +1,24 @@
 .bookings-page-with-filters {
-  display: flex;
-  gap: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
+  @apply flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 container mx-auto p-4 sm:p-6 lg:p-8;
 }
 
 .bookings-filters {
-  width: 280px;
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: fit-content;
+  @apply w-full lg:w-80 bg-white rounded-xl p-4 sm:p-6 shadow-sm h-fit;
+
   position: sticky;
   top: 2rem;
 }
 
 .bookings-filters__title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #e5e7eb;
+  @apply text-responsive-xl font-semibold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-2 border-gray-200;
 }
 
 .bookings-filters__section {
-  margin-bottom: 2rem;
+  @apply mb-6 sm:mb-8;
 }
 
 .bookings-filters__section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 1rem;
+  @apply text-responsive-base font-semibold text-gray-700 mb-3 sm:mb-4;
 }
 
 .bookings-filters__checkbox-group {
@@ -52,7 +36,7 @@
 .bookings-filters__checkbox {
   width: 16px;
   height: 16px;
-  accent-color: #3b82f6;
+  accent-color: var(--color-primary);
   cursor: pointer;
 }
 
@@ -76,7 +60,7 @@
 .bookings-filters__select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
 .bookings-filters__input-group {
@@ -96,7 +80,7 @@
 .bookings-filters__input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
 .bookings-filters__clear-btn {
@@ -127,7 +111,7 @@
   padding: 1.5rem;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .bookings-sort-controls__left {
@@ -155,7 +139,7 @@
 .bookings-sort-controls__select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
 .bookings-sort-controls__right {
@@ -198,7 +182,7 @@
 .bookings-filters__date-input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
 .bookings-filters__date-input::placeholder {
@@ -228,45 +212,79 @@
 .bookings-filters__price-input:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 10%);
 }
 
-@media (max-width: 1024px) {
+/* Enhanced Responsive Design */
+@media (width <= 640px) {
   .bookings-page-with-filters {
-    flex-direction: column;
-    gap: 1.5rem;
+    @apply p-2 gap-3;
   }
 
   .bookings-filters {
-    width: 100%;
+    @apply p-3 static;
+
     position: static;
   }
 
   .bookings-sort-controls {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
+    @apply flex-col gap-3 p-3;
   }
 
   .bookings-sort-controls__left {
-    justify-content: center;
+    @apply justify-center;
   }
 
   .bookings-sort-controls__right {
-    justify-content: center;
+    @apply justify-center;
   }
 }
 
-@media (max-width: 768px) {
+@media (width >= 641px) and (width <= 768px) {
   .bookings-page-with-filters {
-    padding: 1rem;
+    @apply p-4 gap-4;
   }
 
   .bookings-filters {
-    padding: 1rem;
+    @apply p-4 static;
+
+    position: static;
   }
 
   .bookings-sort-controls {
-    padding: 1rem;
+    @apply flex-col gap-4 p-4;
+  }
+}
+
+@media (width >= 769px) and (width <= 1024px) {
+  .bookings-page-with-filters {
+    @apply p-6 gap-6;
+  }
+
+  .bookings-filters {
+    @apply p-5 static;
+
+    position: static;
+  }
+
+  .bookings-sort-controls {
+    @apply flex-col gap-4 p-5;
+  }
+}
+
+@media (width >= 1025px) {
+  .bookings-page-with-filters {
+    @apply p-8 gap-8;
+  }
+
+  .bookings-filters {
+    @apply p-6;
+
+    position: sticky;
+    top: 2rem;
+  }
+
+  .bookings-sort-controls {
+    @apply flex-row gap-6 p-6;
   }
 }

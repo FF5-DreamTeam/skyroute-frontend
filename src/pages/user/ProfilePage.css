@@ -67,7 +67,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgb(0 0 0 / 70%);
   color: white;
   text-align: center;
   padding: var(--spacing-sm);
@@ -77,7 +77,7 @@
 }
 
 .profile-image-upload:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgb(0 0 0 / 80%);
 }
 
 .profile-image-input {
@@ -124,7 +124,7 @@
 .profile-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+  box-shadow: 0 0 0 3px rgb(187 216 216 / 10%);
 }
 
 .profile-value {
@@ -250,7 +250,7 @@
   padding: var(--spacing-2xl);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .profile-page {
     padding: var(--spacing-lg);
   }
