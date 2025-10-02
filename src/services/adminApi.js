@@ -366,12 +366,7 @@ export const adminApi = {
       }
     },
     
-    getById: async (id) => {
-      const response = await fetch(`${API_BASE}/bookings/${id}`, {
-        headers: getAuthHeaders()
-      });
-      return response.json();
-    },
+    
     
     create: async (bookingData) => {
       const response = await fetch(`${API_BASE}/bookings`, {
