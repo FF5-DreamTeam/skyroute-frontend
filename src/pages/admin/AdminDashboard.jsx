@@ -794,12 +794,33 @@ const AdminDashboard = () => {
             };
           });
         } else if (activeTab === 'bookings') {
-          processedData = processedData.map(booking => {
-            return {
+          processedData = processedData.map((booking, index) => {
+            
+            const passengerNames = Array.isArray(booking.passengerNames) 
+              ? booking.passengerNames.join(', ') 
+              : booking.passengerNames || 'N/A';
+            
+            const passengerBirthDates = Array.isArray(booking.passengerBirthDates) 
+              ? booking.passengerBirthDates.join(', ') 
+              : booking.passengerBirthDates || 'N/A';
+            
+            const validBookingId = booking.bookingId || booking.id || (index + 1);
+            
+            const processedBooking = {
               ...booking,
-              status: booking.status || 'PENDING',
-              createdAt: booking.createdAt ? new Date(booking.createdAt).toLocaleString() : '-'
+              id: validBookingId,
+              bookingId: validBookingId,
+              bookingNumber: booking.bookingNumber || `BK${String(validBookingId).padStart(3, '0')}`,
+              flightNumber: booking.flightNumber || `SR${booking.flightId || 'N/A'}`,
+              bookedSeats: booking.bookedSeats || 0,
+              passengerNames: passengerNames,
+              passengerBirthDates: passengerBirthDates,
+              bookingStatus: booking.bookingStatus || 'UNKNOWN',
+              totalPrice: booking.totalPrice || 0,
+              createdAt: booking.createdAt || new Date().toISOString()
             };
+            
+            return processedBooking;
           });
         }
         
