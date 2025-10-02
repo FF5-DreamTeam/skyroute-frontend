@@ -12,7 +12,12 @@ const DataTable = ({
   onStatusChange, 
   onRoleChange,
   pagination,
-  onPageChange 
+  onPageChange,
+  searchId,
+  onSearchInputChange,
+  onSearchSubmit,
+  onClearSearch,
+  isSearching
 }) => {
   const [pageInput, setPageInput] = useState('');
 
@@ -94,12 +99,40 @@ const DataTable = ({
             {pagination?.totalElements || data.length} items
           </span>
         </div>
-        <button 
-          className="data-table__add-btn"
-          onClick={onAdd}
-        >
-          Add {entity.charAt(0).toUpperCase() + entity.slice(1).slice(0, -1)}
-        </button>
+        <div className="data-table__actions">
+          <form className="data-table__search-form" onSubmit={onSearchSubmit}>
+            <input
+              type="number"
+              placeholder={`Search by ID...`}
+              value={searchId}
+              onChange={onSearchInputChange}
+              className="data-table__search-input"
+            />
+            <button 
+              type="submit" 
+              className="data-table__search-btn"
+              disabled={!searchId.trim()}
+            >
+              🔍
+            </button>
+            {isSearching && (
+              <button 
+                type="button"
+                onClick={onClearSearch}
+                className="data-table__clear-btn"
+                title="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </form>
+          <button 
+            className="data-table__add-btn"
+            onClick={onAdd}
+          >
+            Add {entity.charAt(0).toUpperCase() + entity.slice(1).slice(0, -1)}
+          </button>
+        </div>
       </div>
 
       <div className="data-table__container">
@@ -195,7 +228,7 @@ const DataTable = ({
                 max={pagination.totalPages}
                 value={pageInput}
                 onChange={handlePageInputChange}
-                placeholder="Go to page"
+                placeholder="Page"
                 className="data-table__page-input"
               />
               <button

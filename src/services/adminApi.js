@@ -66,6 +66,16 @@ export const adminApi = {
       return response.json();
     },
     
+    getById: async (id) => {
+      const response = await fetch(`${API_BASE}/users/${id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error('User not found');
+      }
+      return { content: [await response.json()] };
+    },
+    
     delete: async (id) => {
       const response = await fetch(`${API_BASE}/users/${id}`, {
         method: 'DELETE',
@@ -128,6 +138,16 @@ export const adminApi = {
       return response.json();
     },
     
+    getById: async (id) => {
+      const response = await fetch(`${API_BASE}/airports/${id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error('Airport not found');
+      }
+      return { content: [await response.json()] };
+    },
+    
     delete: async (id) => {
       const response = await fetch(`${API_BASE}/airports/${id}`, {
         method: 'DELETE',
@@ -178,6 +198,16 @@ export const adminApi = {
       return response.json();
     },
     
+    getById: async (id) => {
+      const response = await fetch(`${API_BASE}/aircrafts/${id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error('Aircraft not found');
+      }
+      return { content: [await response.json()] };
+    },
+    
     delete: async (id) => {
       const response = await fetch(`${API_BASE}/aircrafts/${id}`, {
         method: 'DELETE',
@@ -211,7 +241,6 @@ export const adminApi = {
     },
     
     create: async (routeData) => {
-      console.log('Creating route with data:', routeData);
       const response = await fetch(`${API_BASE}/routes`, {
         method: 'POST',
         headers: {
@@ -231,7 +260,6 @@ export const adminApi = {
     },
     
     update: async (id, routeData) => {
-      console.log('Updating route with data:', routeData);
       const response = await fetch(`${API_BASE}/routes/${id}`, {
         method: 'PUT',
         headers: {
@@ -248,6 +276,16 @@ export const adminApi = {
       }
       
       return response.json();
+    },
+    
+    getById: async (id) => {
+      const response = await fetch(`${API_BASE}/routes/${id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error('Route not found');
+      }
+      return { content: [await response.json()] };
     },
     
     delete: async (id) => {
@@ -279,7 +317,10 @@ export const adminApi = {
       const response = await fetch(`${API_BASE}/flights/admin/${id}`, {
         headers: getAuthHeaders()
       });
-      return response.json();
+      if (!response.ok) {
+        throw new Error('Flight not found');
+      }
+      return { content: [await response.json()] };
     },
     
     create: async (flightData) => {
@@ -431,6 +472,16 @@ export const adminApi = {
         body: JSON.stringify({ birthDates })
       });
       return response.json();
+    },
+    
+    getById: async (id) => {
+      const response = await fetch(`${API_BASE}/bookings/${id}`, {
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error('Booking not found');
+      }
+      return { content: [await response.json()] };
     },
     
     delete: async (id) => {

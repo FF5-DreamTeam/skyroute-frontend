@@ -73,16 +73,30 @@ const AdminModal = ({
           if (aircraft) {
             initialSearchTerms.aircraftId = `${aircraft.model} (${aircraft.manufacturer}) - ${aircraft.capacity} seats`;
           }
+        } else if (data.aircraft && data.aircraft.model && data.aircraft.manufacturer) {
+          initialSearchTerms.aircraftId = `${data.aircraft.model} (${data.aircraft.manufacturer}) - ${data.aircraft.capacity || 'N/A'} seats`;
         }
         if (data.routeId) {
           const route = routes.find(route => route.id === data.routeId);
           if (route) {
-            const originAirport = airports.find(airport => airport.id === route.originId);
-            const destinationAirport = airports.find(airport => airport.id === route.destinationId);
-            const originName = originAirport ? `${originAirport.code} (${originAirport.city})` : `ID: ${route.originId}`;
-            const destinationName = destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : `ID: ${route.destinationId}`;
+            let originAirport, destinationAirport;
+            
+            if (route.originId && route.destinationId) {
+              originAirport = airports.find(airport => airport.id === route.originId);
+              destinationAirport = airports.find(airport => airport.id === route.destinationId);
+            } else if (route.origin && route.destination) {
+              originAirport = route.origin;
+              destinationAirport = route.destination;
+            }
+            
+            const originName = originAirport ? `${originAirport.code} (${originAirport.city})` : `ID: ${route.originId || 'N/A'}`;
+            const destinationName = destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : `ID: ${route.destinationId || 'N/A'}`;
             initialSearchTerms.routeId = `${originName} → ${destinationName}`;
           }
+        } else if (data.route && data.route.origin && data.route.destination) {
+          const originName = `${data.route.origin.code} (${data.route.origin.city})`;
+          const destinationName = `${data.route.destination.code} (${data.route.destination.city})`;
+          initialSearchTerms.routeId = `${originName} → ${destinationName}`;
         }
         setSearchTerm(initialSearchTerms);
       } else {
@@ -616,8 +630,21 @@ const AdminModal = ({
                       accept="image/*"
                       className="admin-modal__file"
                     />
+                    {/* Show current image in edit mode */}
+                    {mode === 'edit' && data && (data[field.key] || data.userImgUrl || data.imageUrl) && !formData[field.key] && (
+                      <div className="admin-modal__current-image">
+                        <p className="admin-modal__current-image-label">Current Image:</p>
+                        <img 
+                          src={data[field.key] || data.userImgUrl || data.imageUrl} 
+                          alt="Current"
+                          className="admin-modal__current-image-preview"
+                        />
+                      </div>
+                    )}
+                    {/* Show new image preview */}
                     {formData[field.key] && (
                       <div className="admin-modal__file-preview">
+                        <p className="admin-modal__file-preview-label">New Image Preview:</p>
                         <img 
                           src={typeof formData[field.key] === 'string' 
                             ? formData[field.key] 

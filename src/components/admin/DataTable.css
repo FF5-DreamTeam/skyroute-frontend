@@ -30,6 +30,80 @@
   font-family: var(--font-body);
 }
 
+.data-table__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.data-table__search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.data-table__search-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-accent-1-light);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  width: 150px;
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+}
+
+.data-table__search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+.data-table__search-btn {
+  background: var(--color-accent-1);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.data-table__search-btn:hover:not(:disabled) {
+  background: var(--color-accent-1-dark);
+  transform: translateY(-1px);
+}
+
+.data-table__search-btn:disabled {
+  background: var(--color-accent-1-light);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.data-table__clear-btn {
+  background: var(--color-error);
+  color: white;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.data-table__clear-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
 .data-table__add-btn {
   background-color: var(--color-primary);
   color: var(--color-background);
@@ -228,9 +302,10 @@
 }
 
 .data-table__page-input {
-  width: 4rem;
+  width: 5rem;
+  height: 3rem;
   padding: 0.375rem 0.5rem;
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
   border-radius: 0.375rem;
   font-size: 0.875rem;
   text-align: center;
@@ -262,6 +337,9 @@
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  height: 3rem;
+  width: 3rem;
+  border: 1px solid var(--color-accent-1-light);
 }
 
 .data-table__page-go-btn:hover:not(:disabled) {
@@ -281,7 +359,7 @@
 .data-table__pagination-btn {
   background-color: var(--color-background);
   color: var(--color-text);
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
   cursor: pointer;
@@ -289,6 +367,7 @@
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 500;
+  height: 3rem;
 }
 
 .data-table__pagination-btn:hover:not(:disabled) {

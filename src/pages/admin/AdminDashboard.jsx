@@ -31,6 +31,8 @@ const AdminDashboard = () => {
   const [statusLoading, setStatusLoading] = useState(false);
   const [flightStatusModal, setFlightStatusModal] = useState({ isOpen: false, item: null });
   const [flightStatusLoading, setFlightStatusLoading] = useState(false);
+  const [searchId, setSearchId] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
 
   const tabs = [
     { id: 'users', label: 'Users', icon: '👥' },
@@ -680,6 +682,166 @@ const AdminDashboard = () => {
     setCurrentPage(page);
   };
 
+  const handleSearchById = async (id) => {
+    if (!id.trim()) {
+      setSearchResults(null);
+      fetchData(currentPage);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let response;
+      const searchId = parseInt(id);
+      
+      switch (activeTab) {
+        case 'users':
+          response = await adminApi.users.getById(searchId);
+          break;
+        case 'airports':
+          response = await adminApi.airports.getById(searchId);
+          break;
+        case 'aircrafts':
+          response = await adminApi.aircrafts.getById(searchId);
+          break;
+        case 'routes':
+          response = await adminApi.routes.getById(searchId);
+          break;
+        case 'flights':
+          response = await adminApi.flights.getById(searchId);
+          break;
+        case 'bookings':
+          response = await adminApi.bookings.getById(searchId);
+          break;
+        default:
+          throw new Error('Unknown entity type');
+      }
+
+      if (response && response.content) {
+        let processedData = response.content;
+        
+        if (activeTab === 'routes') {
+          processedData = processedData.map(route => {
+            let originAirport, destinationAirport;
+            
+            if (route.originId && route.destinationId) {
+              originAirport = airports.find(airport => airport.id === route.originId);
+              destinationAirport = airports.find(airport => airport.id === route.destinationId);
+            } else if (route.origin && route.destination) {
+              originAirport = route.origin;
+              destinationAirport = route.destination;
+            }
+            
+            return {
+              ...route,
+              originCode: originAirport ? `${originAirport.code} - ${originAirport.city}` : '-',
+              destinationCode: destinationAirport ? `${destinationAirport.code} - ${destinationAirport.city}` : '-'
+            };
+          });
+        } else if (activeTab === 'flights') {
+          
+          processedData = processedData.map((flight, index) => {
+            if (flight.aircraft && flight.route) {
+              const originCode = flight.route.origin ? `${flight.route.origin.code} (${flight.route.origin.city})` : 'N/A';
+              const destinationCode = flight.route.destination ? `${flight.route.destination.code} (${flight.route.destination.city})` : 'N/A';
+              return {
+                ...flight,
+                id: flight.id || `flight-${index}`,
+                originalAircraftId: flight.aircraft.id,
+                originalRouteId: flight.route.id,
+                aircraftId: `${flight.aircraft.model} (${flight.aircraft.manufacturer})`,
+                routeId: `${originCode} → ${destinationCode}`,
+                departure: originCode,
+                arrival: destinationCode,
+                available: flight.available ? 'Yes' : 'No'
+              };
+            }
+            
+            const aircraft = aircrafts.find(ac => 
+              ac.id === flight.aircraftId || 
+              ac.id === parseInt(flight.aircraftId) ||
+              parseInt(ac.id) === flight.aircraftId
+            );
+            
+            const route = routes.find(r => 
+              r.id === flight.routeId || 
+              r.id === parseInt(flight.routeId) ||
+              parseInt(r.id) === flight.routeId
+            );
+            
+            let originAirport, destinationAirport;
+            if (route) {
+              if (route.originId && route.destinationId) {
+                originAirport = airports.find(airport => airport.id === route.originId);
+                destinationAirport = airports.find(airport => airport.id === route.destinationId);
+              } else if (route.origin && route.destination) {
+                originAirport = route.origin;
+                destinationAirport = route.destination;
+              }
+            }
+            
+            
+            return {
+              ...flight,
+              id: flight.id || `flight-${index}`,
+              originalAircraftId: flight.aircraftId,
+              originalRouteId: flight.routeId,
+              aircraftId: aircraft ? `${aircraft.model} (${aircraft.manufacturer})` : `ID: ${flight.aircraftId || 'N/A'}`,
+              routeId: route ? `Route ${route.id}` : `ID: ${flight.routeId || 'N/A'}`,
+              departure: originAirport ? `${originAirport.code} (${originAirport.city})` : '-',
+              arrival: destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : '-',
+              available: flight.available ? 'Yes' : 'No'
+            };
+          });
+        } else if (activeTab === 'bookings') {
+          processedData = processedData.map(booking => {
+            return {
+              ...booking,
+              status: booking.status || 'PENDING',
+              createdAt: booking.createdAt ? new Date(booking.createdAt).toLocaleString() : '-'
+            };
+          });
+        }
+        
+        setSearchResults(processedData);
+        setData(processedData);
+      } else {
+        setSearchResults([]);
+        setData([]);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error(`${activeTab.slice(0, -1)} with ID ${id} not found`);
+      setSearchResults([]);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchId(value);
+    
+    if (value.trim() === '') {
+      setSearchResults(null);
+      fetchData(currentPage);
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchId.trim()) {
+      handleSearchById(searchId);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchId('');
+    setSearchResults(null);
+    fetchData(currentPage);
+  };
+
   const renderTabContent = () => {
     return (
       <DataTable
@@ -694,6 +856,11 @@ const AdminDashboard = () => {
         onRoleChange={activeTab === 'users' ? handleRoleChange : null}
         pagination={pagination}
         onPageChange={handlePageChange}
+        searchId={searchId}
+        onSearchInputChange={handleSearchInputChange}
+        onSearchSubmit={handleSearchSubmit}
+        onClearSearch={clearSearch}
+        isSearching={searchResults !== null}
       />
     );
   };
