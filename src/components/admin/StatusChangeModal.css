@@ -191,24 +191,55 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 768px) {
+  .status-change-modal {
+    max-width: 90%;
+    margin: 1rem;
+  }
+
+  .status-change-modal__status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .status-change-modal {
     margin: 1rem;
     max-width: calc(100vw - 2rem);
   }
-  
+
   .status-change-modal__header,
   .status-change-modal__content,
   .status-change-modal__footer {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .status-change-modal__status-grid {
     gap: 0.5rem;
   }
-  
+
   .status-change-modal__status-card {
     padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .status-change-modal {
+    max-width: 95%;
+    margin: 0.5rem;
+  }
+
+  .status-change-modal__status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-change-modal__footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .status-change-modal__btn {
+    width: 100%;
   }
 }

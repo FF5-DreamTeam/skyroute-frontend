@@ -212,11 +212,21 @@
   background-color: #2563eb;
 }
 
-/* Responsive design */
+@media (max-width: 768px) {
+  .flight-status-modal {
+    max-width: 90%;
+    margin: 1rem;
+  }
+
+  .flight-status-modal__status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .flight-status-modal {
-    margin: 20px;
-    max-width: none;
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
   }
 
   .flight-status-modal__status-grid {
@@ -229,5 +239,18 @@
 
   .flight-status-modal__btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .flight-status-modal {
+    max-width: 95%;
+    margin: 0.5rem;
+  }
+
+  .flight-status-modal__header,
+  .flight-status-modal__content,
+  .flight-status-modal__actions {
+    padding: 1rem;
   }
 }
