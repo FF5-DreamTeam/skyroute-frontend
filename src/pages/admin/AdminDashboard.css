@@ -26,6 +26,7 @@
 .admin-dashboard__tabs {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 1rem;
   margin-bottom: 2rem;
   padding: 1rem;
@@ -40,7 +41,7 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   background-color: var(--color-background);
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -53,7 +54,7 @@
 
 .admin-tab:hover {
   background-color: var(--color-main-light);
-  border-color: var(--color-primary);
+  border-color: var(--color-accent-1-dark);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -63,6 +64,7 @@
   border-color: var(--color-primary);
   color: var(--color-background);
   box-shadow: 0 4px 12px rgba(187, 216, 216, 0.3);
+  border-color: var(--color-accent-3);
 }
 
 .admin-tab--active:hover {

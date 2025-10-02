@@ -169,7 +169,7 @@ const ProfilePage = () => {
       <div className="profile-container">
         <div className="profile-card">
           <div className="profile-header">
-            <h1 className="profile-title">User Profile</h1>
+            <h1 className="profile-title">Profile</h1>
             {!editing && (
               <button 
                 onClick={() => setEditing(true)}

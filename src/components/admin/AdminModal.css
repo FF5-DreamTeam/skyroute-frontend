@@ -18,9 +18,13 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   max-width: 600px;
   width: 100%;
+  min-height: 320px;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: visible;
   font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-modal__header {
@@ -70,13 +74,14 @@
 }
 
 .admin-modal__body {
-  padding: 2rem;
+  padding: 1rem 2rem;
   flex: 1;
   overflow-y: auto;
+  overflow-x: visible;
 }
 
 .admin-modal__field {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .admin-modal__label {
@@ -96,8 +101,263 @@
 
 .admin-modal__input {
   width: 100%;
+  height: 40px;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.admin-modal__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+.admin-modal__input[type="select"],
+select.admin-modal__input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select.admin-modal__input option {
+  padding: 0.5rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+/* Improved select options */
+.admin-modal__select option {
+  padding: 8px 12px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.admin-modal__select option:hover {
+  background-color: var(--color-accent-1-light);
+}
+
+.admin-modal__select option:checked {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.admin-modal__select option:focus {
+  background-color: var(--color-accent-1-light);
+  outline: none;
+}
+
+/* Ensure proper scrolling behavior */
+select.admin-modal__input:focus {
+  scroll-behavior: smooth;
+}
+
+/* Custom dropdown container */
+.admin-modal__dropdown-container {
+  position: relative;
+  width: 100%;
+  min-width: 280px;
+}
+
+/* Dropdown input */
+.admin-modal__dropdown-input {
+  width: 100%;
+  min-width: 280px;
+  max-width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 1px solid var(--color-accent-1-light);
+  border-radius: 0.5rem;
+  background-color: var(--color-background);
+  font-size: 1rem;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.admin-modal__dropdown-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+/* Arrow rotation when dropdown is open */
+.admin-modal__dropdown-container:has(.admin-modal__dropdown)
+  .admin-modal__dropdown-input {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='18,15 12,9 6,15'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Dropdown list */
+.admin-modal__dropdown {
+  position: fixed;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  z-index: 1001;
+  max-height: 300px;
+  overflow-y: auto;
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: top;
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Dropdown items */
+.admin-modal__dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.admin-modal__dropdown-item:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.admin-modal__dropdown-item:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.admin-modal__dropdown-item:last-child {
+  border-bottom: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.admin-modal__dropdown-item:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.admin-modal__dropdown-item:only-child {
+  border-radius: 12px;
+}
+
+/* Dropdown icon */
+.admin-modal__dropdown-icon {
+  margin-right: 12px;
+  font-size: 16px;
+  opacity: 0.7;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-modal__dropdown-item:hover .admin-modal__dropdown-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Dropdown text */
+.admin-modal__dropdown-text {
+  font-weight: 500;
+  color: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.admin-modal__dropdown-item:hover .admin-modal__dropdown-text {
+  color: white;
+  font-weight: 600;
+}
+
+/* Dropdown loading */
+.admin-modal__dropdown-loading {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  font-style: italic;
+  background: #f8fafc;
+  border-radius: 12px;
+  margin: 4px;
+}
+
+/* Custom scrollbar for dropdown */
+.admin-modal__dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-modal__dropdown::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.admin-modal__dropdown::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.admin-modal__dropdown::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar styling */
+.admin-modal__dropdown {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* DatePicker styling */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  height: 40px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-accent-1-light);
   border-radius: 0.5rem;
   font-size: 1rem;
   color: var(--color-text);
@@ -106,10 +366,105 @@
   font-family: var(--font-body);
 }
 
-.admin-modal__input:focus {
+.react-datepicker__input-container input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1);
+}
+
+.react-datepicker__input-container input.admin-modal__input--error {
+  border-color: var(--color-error);
+}
+
+.react-datepicker {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-body);
+  z-index: 1002;
+}
+
+.react-datepicker__header {
+  background-color: var(--color-background-2);
+  border-bottom: 1px solid var(--color-background-3);
+  border-radius: 12px 12px 0 0;
+}
+
+.react-datepicker__current-month {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.react-datepicker__day-name {
+  color: var(--color-text-2);
+  font-weight: 500;
+}
+
+.react-datepicker__day {
+  color: var(--color-text);
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--color-accent-1-light);
+}
+
+.react-datepicker__day--selected {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.react-datepicker__day--selected:hover {
+  background-color: var(--color-main-dark);
+}
+
+.react-datepicker__time-container {
+  border-left: 1px solid var(--color-background-3);
+}
+
+.react-datepicker__time-list-item--selected {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.react-datepicker__time-list-item:hover {
+  background-color: var(--color-accent-1-light);
+}
+
+/* Mantine DatePicker styling */
+.admin-modal__mantine-date {
+  width: 100% !important;
+  height: 40px !important;
+  padding: 0.75rem 1rem !important;
+  border: 1px solid var(--color-accent-1-light) !important;
+  border-radius: 0.5rem !important;
+  font-size: 1rem !important;
+  color: var(--color-text) !important;
+  background-color: var(--color-background) !important;
+  transition: all 0.2s ease !important;
+  font-family: var(--font-body) !important;
+  text-align: left !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.admin-modal__mantine-date:focus {
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(187, 216, 216, 0.1) !important;
+}
+
+.admin-modal__mantine-date.admin-modal__input--error {
+  border-color: var(--color-error) !important;
+}
+
+/* Mantine Popover positioning */
+.mantine-Popover-dropdown {
+  z-index: 1003 !important;
+}
+
+/* Ensure Mantine calendar doesn't interfere with modal */
+.mantine-DatePickerInput-popover {
+  z-index: 1003 !important;
 }
 
 .admin-modal__input--error {
@@ -206,7 +561,7 @@
 
 .admin-modal__file {
   padding: 0.5rem;
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
   border-radius: 0.5rem;
   background-color: var(--color-background);
   font-family: var(--font-body);
@@ -254,6 +609,15 @@
   font-weight: 500;
 }
 
+.admin-modal__capacity-hint {
+  display: block;
+  color: var(--color-text-2);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  font-style: italic;
+}
+
 .admin-modal__footer {
   display: flex;
   justify-content: flex-end;
@@ -263,6 +627,7 @@
   background-color: var(--color-background-2);
   border-bottom-left-radius: 1rem;
   border-bottom-right-radius: 1rem;
+  flex-shrink: 0;
 }
 
 .admin-modal__btn {
@@ -282,7 +647,7 @@
 .admin-modal__btn--cancel {
   background-color: var(--color-background);
   color: var(--color-text);
-  border: 1px solid var(--color-background-3);
+  border: 1px solid var(--color-accent-1-light);
 }
 
 .admin-modal__btn--cancel:hover:not(:disabled) {
@@ -293,6 +658,7 @@
 .admin-modal__btn--submit {
   background-color: var(--color-primary);
   color: var(--color-background);
+  border: 1px solid var(--color-accent-1-light);
 }
 
 .admin-modal__btn--submit:hover:not(:disabled) {

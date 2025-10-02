@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { DatePickerInput } from '@mantine/dates';
+import dayjs from 'dayjs';
 import './AdminModal.css';
 
 const AdminModal = ({ 
@@ -16,17 +20,156 @@ const AdminModal = ({
 }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const [showDropdown, setShowDropdown] = useState({});
+  const [searchTerm, setSearchTerm] = useState({});
+  const [filteredOptions, setFilteredOptions] = useState({});
+  const [dropdownPosition, setDropdownPosition] = useState({});
 
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && data) {
-        setFormData({ ...data });
+        
+        const formDataToSet = { ...data };
+        
+        if (data.origin && data.origin.id) {
+          formDataToSet.originId = data.origin.id;
+        }
+        if (data.destination && data.destination.id) {
+          formDataToSet.destinationId = data.destination.id;
+        }
+        
+        Object.keys(formDataToSet).forEach(key => {
+          if (key.includes('Time') && typeof formDataToSet[key] === 'string') {
+            formDataToSet[key] = new Date(formDataToSet[key]);
+          }
+        });
+
+        if (entity === 'bookings' && formDataToSet.passengers) {
+          formDataToSet.bookedSeats = formDataToSet.passengers.length;
+        }
+        
+        setFormData(formDataToSet);
+        const initialSearchTerms = {};
+        
+        if (data.originId) {
+          const airport = airports.find(airport => airport.id === data.originId);
+          if (airport) {
+            initialSearchTerms.originId = `${airport.code} - ${airport.city}`;
+          }
+        } else if (data.origin) {
+          initialSearchTerms.originId = `${data.origin.code} - ${data.origin.city}`;
+        }
+        
+        if (data.destinationId) {
+          const airport = airports.find(airport => airport.id === data.destinationId);
+          if (airport) {
+            initialSearchTerms.destinationId = `${airport.code} - ${airport.city}`;
+          }
+        } else if (data.destination) {
+          initialSearchTerms.destinationId = `${data.destination.code} - ${data.destination.city}`;
+        }
+        if (data.aircraftId) {
+          const aircraft = aircrafts.find(aircraft => aircraft.id === data.aircraftId);
+          if (aircraft) {
+            initialSearchTerms.aircraftId = `${aircraft.model} (${aircraft.manufacturer}) - ${aircraft.capacity} seats`;
+          }
+        }
+        if (data.routeId) {
+          const route = routes.find(route => route.id === data.routeId);
+          if (route) {
+            const originAirport = airports.find(airport => airport.id === route.originId);
+            const destinationAirport = airports.find(airport => airport.id === route.destinationId);
+            const originName = originAirport ? `${originAirport.code} (${originAirport.city})` : `ID: ${route.originId}`;
+            const destinationName = destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : `ID: ${route.destinationId}`;
+            initialSearchTerms.routeId = `${originName} → ${destinationName}`;
+          }
+        }
+        setSearchTerm(initialSearchTerms);
       } else {
         setFormData(getDefaultFormData(entity));
+        setSearchTerm({});
       }
       setErrors({});
+      setShowDropdown({});
+      setFilteredOptions({});
+      setDropdownPosition({});
     }
-  }, [isOpen, mode, data, entity]);
+  }, [isOpen, mode, data, entity, airports, aircrafts, routes]);
+
+  useEffect(() => {
+    if (isOpen && mode === 'edit' && data) {
+      const timer = setTimeout(() => {
+        const selectFields = document.querySelectorAll('input[name="originId"], input[name="destinationId"], input[name="aircraftId"], input[name="routeId"]');
+        
+        selectFields.forEach((input) => {
+          const fieldKey = input.name;
+          
+          if (fieldKey) {
+            const inputRect = input.getBoundingClientRect();
+            setDropdownPosition(prev => ({
+              ...prev,
+              [fieldKey]: {
+                top: inputRect.bottom + 8,
+                left: inputRect.left,
+                width: inputRect.width
+              }
+            }));
+          }
+        });
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, mode, data, searchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const isOutsideModal = !event.target.closest('.admin-modal');
+      const isOnMantineCalendar = event.target.closest('.mantine-Popover-dropdown') || 
+                                 event.target.closest('.mantine-DatePickerInput-input') ||
+                                 event.target.closest('.mantine-DatePickerInput-calendar') ||
+                                 event.target.closest('[data-mantine-datepicker]');
+      
+      if (isOutsideModal && !isOnMantineCalendar) {
+        setShowDropdown({});
+        setDropdownPosition({});
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setShowDropdown({});
+        setDropdownPosition({});
+      }
+    };
+
+    const handleBodyClick = (event) => {
+      const isOnMantineCalendar = event.target.closest('.mantine-Popover-dropdown') || 
+                                 event.target.closest('.mantine-DatePickerInput-input') ||
+                                 event.target.closest('.mantine-DatePickerInput-calendar') ||
+                                 event.target.closest('[data-mantine-datepicker]');
+      
+      if (!isOnMantineCalendar) {
+        const popovers = document.querySelectorAll('.mantine-Popover-dropdown');
+        popovers.forEach(popover => {
+          if (popover.style.display !== 'none') {
+            popover.style.display = 'none';
+          }
+        });
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+      document.addEventListener('click', handleBodyClick);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleEscape);
+        document.removeEventListener('click', handleBodyClick);
+      };
+    }
+  }, [isOpen]);
 
   const getDefaultFormData = (entity) => {
     switch (entity) {
@@ -69,7 +212,7 @@ const AdminModal = ({
       case 'bookings':
         return {
           flightId: '',
-          bookedSeats: '',
+          bookedSeats: 1,
           passengers: [
             { name: '', birthDate: '' }
           ]
@@ -129,17 +272,25 @@ const AdminModal = ({
   };
 
   const addPassenger = () => {
-    setFormData(prev => ({
-      ...prev,
-      passengers: [...prev.passengers, { name: '', birthDate: '' }]
-    }));
+    setFormData(prev => {
+      const newPassengers = [...prev.passengers, { name: '', birthDate: '' }];
+      return {
+        ...prev,
+        passengers: newPassengers,
+        bookedSeats: newPassengers.length
+      };
+    });
   };
 
   const removePassenger = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      passengers: prev.passengers.filter((_, i) => i !== index)
-    }));
+    setFormData(prev => {
+      const newPassengers = prev.passengers.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        passengers: newPassengers,
+        bookedSeats: newPassengers.length
+      };
+    });
   };
 
   const handleInputChange = (e) => {
@@ -179,6 +330,203 @@ const AdminModal = ({
         [name]: ''
       }));
     }
+
+    if (name === 'availableSeats' && entity === 'flights' && formData.aircraftId) {
+      const aircraftCapacity = getAircraftCapacity(formData.aircraftId);
+      if (aircraftCapacity && parseInt(value) > aircraftCapacity) {
+        setErrors(prev => ({
+          ...prev,
+          [name]: `Available seats (${value}) cannot exceed aircraft capacity (${aircraftCapacity})`
+        }));
+      }
+    }
+
+    if (name === 'bookedSeats' && entity === 'bookings') {
+      const seatsCount = parseInt(value) || 0;
+      const currentPassengers = formData.passengers || [];
+      
+      if (seatsCount > currentPassengers.length) {
+        const passengersToAdd = seatsCount - currentPassengers.length;
+        const newPassengers = [...currentPassengers];
+        for (let i = 0; i < passengersToAdd; i++) {
+          newPassengers.push({ name: '', birthDate: '' });
+        }
+        setFormData(prev => ({
+          ...prev,
+          passengers: newPassengers
+        }));
+      } else if (seatsCount < currentPassengers.length) {
+        const passengersToKeep = currentPassengers.slice(0, seatsCount);
+        setFormData(prev => ({
+          ...prev,
+          passengers: passengersToKeep
+        }));
+      }
+    }
+  };
+
+  const handleDateChange = (date, fieldName) => {
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: date
+    }));
+
+    if (errors[fieldName]) {
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: ''
+      }));
+    }
+  };
+
+  const handleMantineDateChange = (date, fieldName) => {
+    const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: value
+    }));
+
+    if (errors[fieldName]) {
+      setErrors(prev => ({
+        ...prev,
+        [fieldName]: ''
+      }));
+    }
+  };
+
+  const getAircraftCapacity = (aircraftId) => {
+    const aircraft = aircrafts.find(aircraft => aircraft.id === aircraftId);
+    return aircraft ? aircraft.capacity : null;
+  };
+
+  const handleSelectSearch = (fieldKey, value, event) => {
+    setSearchTerm(prev => ({ ...prev, [fieldKey]: value }));
+    setShowDropdown(prev => ({ ...prev, [fieldKey]: true }));
+    
+    if (!dropdownPosition[fieldKey] && event) {
+      const inputRect = event.target.getBoundingClientRect();
+      setDropdownPosition(prev => ({
+        ...prev,
+        [fieldKey]: {
+          top: inputRect.bottom + 8,
+          left: inputRect.left,
+          width: inputRect.width
+        }
+      }));
+    }
+    
+    let options = [];
+    if (fieldKey === 'originId' || fieldKey === 'destinationId') {
+      options = airports.filter(airport => 
+        airport.city.toLowerCase().includes(value.toLowerCase()) ||
+        airport.code.toLowerCase().includes(value.toLowerCase())
+      );
+    } else if (fieldKey === 'aircraftId') {
+      options = aircrafts.filter(aircraft => 
+        aircraft.model.toLowerCase().includes(value.toLowerCase()) ||
+        aircraft.manufacturer.toLowerCase().includes(value.toLowerCase())
+      );
+    } else if (fieldKey === 'routeId') {
+      options = routes.filter(route => {
+        let originAirport, destinationAirport;
+        
+        if (route.originId && route.destinationId) {
+          originAirport = airports.find(airport => airport.id === route.originId);
+          destinationAirport = airports.find(airport => airport.id === route.destinationId);
+        } else if (route.origin && route.destination) {
+          originAirport = route.origin;
+          destinationAirport = route.destination;
+        }
+        
+        const originName = originAirport ? `${originAirport.code} (${originAirport.city})` : `ID: ${route.originId || 'unknown'}`;
+        const destinationName = destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : `ID: ${route.destinationId || 'unknown'}`;
+        const routeText = `${originName} → ${destinationName}`;
+        return routeText.toLowerCase().includes(value.toLowerCase());
+      });
+    }
+    
+    setFilteredOptions(prev => ({ ...prev, [fieldKey]: options }));
+  };
+
+  const handleSelectOption = (fieldKey, option) => {
+    setFormData(prev => ({ ...prev, [fieldKey]: option.id }));
+    setSearchTerm(prev => ({ ...prev, [fieldKey]: getDisplayText(fieldKey, option) }));
+    setShowDropdown(prev => ({ ...prev, [fieldKey]: false }));
+
+    if (fieldKey === 'aircraftId' && entity === 'flights' && formData.availableSeats) {
+      const aircraftCapacity = getAircraftCapacity(option.id);
+      if (aircraftCapacity && parseInt(formData.availableSeats) > aircraftCapacity) {
+        setErrors(prev => ({
+          ...prev,
+          availableSeats: `Available seats (${formData.availableSeats}) cannot exceed aircraft capacity (${aircraftCapacity})`
+        }));
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          availableSeats: ''
+        }));
+      }
+    }
+  };
+
+  const getDisplayText = (fieldKey, option) => {
+    if (!option || !option.id) return '';
+    
+    if (fieldKey === 'originId' || fieldKey === 'destinationId') {
+      const airport = airports.find(airport => airport.id === option.id);
+      if (airport) {
+        return `${airport.code} - ${airport.city}`;
+      }
+    } else if (fieldKey === 'aircraftId') {
+      const aircraft = aircrafts.find(aircraft => aircraft.id === option.id);
+      if (aircraft) {
+        return `${aircraft.model} (${aircraft.manufacturer}) - ${aircraft.capacity} seats`;
+      }
+    } else if (fieldKey === 'routeId') {
+      const route = routes.find(route => route.id === option.id);
+      if (route) {
+        let originAirport, destinationAirport;
+        
+        if (route.originId && route.destinationId) {
+          originAirport = airports.find(airport => airport.id === route.originId);
+          destinationAirport = airports.find(airport => airport.id === route.destinationId);
+        } else if (route.origin && route.destination) {
+          originAirport = route.origin;
+          destinationAirport = route.destination;
+        }
+        
+        const originName = originAirport ? `${originAirport.code} (${originAirport.city})` : `ID: ${route.originId || 'unknown'}`;
+        const destinationName = destinationAirport ? `${destinationAirport.code} (${destinationAirport.city})` : `ID: ${route.destinationId || 'unknown'}`;
+        return `${originName} → ${destinationName}`;
+      }
+    }
+    return '';
+  };
+
+  const handleSelectFocus = (fieldKey, event) => {
+    setSearchTerm(prev => ({ ...prev, [fieldKey]: '' }));
+    setShowDropdown(prev => ({ ...prev, [fieldKey]: true }));
+    
+    const inputRect = event.target.getBoundingClientRect();
+    setDropdownPosition(prev => ({
+      ...prev,
+      [fieldKey]: {
+        top: inputRect.bottom + 8,
+        left: inputRect.left,
+        width: inputRect.width
+      }
+    }));
+    
+    let options = [];
+    if (fieldKey === 'originId' || fieldKey === 'destinationId') {
+      options = airports;
+    } else if (fieldKey === 'aircraftId') {
+      options = aircrafts;
+    } else if (fieldKey === 'routeId') {
+      options = routes;
+    }
+    
+    setFilteredOptions(prev => ({ ...prev, [fieldKey]: options }));
   };
 
   const validateForm = () => {
@@ -194,6 +542,13 @@ const AdminModal = ({
       }
     });
 
+    if (entity === 'flights' && formData.aircraftId && formData.availableSeats) {
+      const aircraftCapacity = getAircraftCapacity(formData.aircraftId);
+      if (aircraftCapacity && parseInt(formData.availableSeats) > aircraftCapacity) {
+        newErrors.availableSeats = `Available seats (${formData.availableSeats}) cannot exceed aircraft capacity (${aircraftCapacity})`;
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -202,7 +557,15 @@ const AdminModal = ({
     e.preventDefault();
     
     if (validateForm()) {
-      onSubmit(formData);
+      const formattedData = { ...formData };
+      
+      Object.keys(formattedData).forEach(key => {
+        if (formattedData[key] instanceof Date) {
+          formattedData[key] = formattedData[key].toISOString();
+        }
+      });
+      
+      onSubmit(formattedData);
     }
   };
 
@@ -217,7 +580,11 @@ const AdminModal = ({
   const fields = getFormFields(entity);
 
   return (
-    <div className="admin-modal-overlay" onClick={handleClose}>
+    <div className="admin-modal-overlay" onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        handleClose();
+      }
+    }}>
       <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal__header">
           <h2 className="admin-modal__title">
@@ -274,46 +641,88 @@ const AdminModal = ({
                     <span className="admin-modal__checkbox-text">Yes</span>
                   </label>
                 ) : field.type === 'select' ? (
-                  <select
-                    name={field.key}
-                    value={formData[field.key] || ''}
-                    onChange={handleInputChange}
+                  <div className="admin-modal__dropdown-container">
+                    <input
+                      type="text"
+                      name={field.key}
+                      value={searchTerm[field.key] || (formData[field.key] ? getDisplayText(field.key, { id: formData[field.key] }) : '') || ''}
+                      onChange={(e) => handleSelectSearch(field.key, e.target.value, e)}
+                      onFocus={(e) => handleSelectFocus(field.key, e)}
+                      placeholder={`Select ${field.label}`}
+                      className={`admin-modal__input admin-modal__dropdown-input ${errors[field.key] ? 'admin-modal__input--error' : ''}`}
+                      required={field.required}
+                      autoComplete="off"
+                    />
+                    {showDropdown[field.key] && dropdownPosition[field.key] && (
+                      <div 
+                        className="admin-modal__dropdown"
+                        style={{
+                          top: `${dropdownPosition[field.key].top}px`,
+                          left: `${dropdownPosition[field.key].left}px`,
+                          width: `${dropdownPosition[field.key].width}px`
+                        }}
+                      >
+                        {filteredOptions[field.key]?.length > 0 ? (
+                          filteredOptions[field.key]
+                            .filter(option => option && option.id)
+                            .map((option) => (
+                              <div
+                                key={option.id}
+                                className="admin-modal__dropdown-item"
+                                onClick={() => handleSelectOption(field.key, option)}
+                              >
+                                <div className="admin-modal__dropdown-icon">
+                                  {field.options === 'airports' && '✈️'}
+                                  {field.options === 'aircrafts' && '🛩️'}
+                                  {field.options === 'routes' && '🛣️'}
+                                </div>
+                                <div className="admin-modal__dropdown-text">
+                                  {getDisplayText(field.key, option)}
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="admin-modal__dropdown-loading">
+                            No options found
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : field.type === 'datetime-local' ? (
+                  <DatePicker
+                    selected={formData[field.key] ? new Date(formData[field.key]) : null}
+                    onChange={(date) => handleDateChange(date, field.key)}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={15}
+                    dateFormat="yyyy-MM-dd HH:mm"
                     className={`admin-modal__input ${errors[field.key] ? 'admin-modal__input--error' : ''}`}
+                    placeholderText={`Select ${field.label}`}
                     required={field.required}
-                  >
-                    <option value="">Select {field.label}</option>
-                    {field.options === 'airports' && airports.map(airport => (
-                      <option key={airport.id} value={airport.id}>
-                        {airport.code} - {airport.city}
-                      </option>
-                    ))}
-                    {field.options === 'aircrafts' && aircrafts.map(aircraft => (
-                      <option key={aircraft.id} value={aircraft.id}>
-                        {aircraft.model} ({aircraft.manufacturer}) - {aircraft.capacity} seats
-                      </option>
-                    ))}
-                    {field.options === 'routes' && routes.map(route => {
-                      if (route.origin && route.destination) {
-                        const originName = `${route.origin.code} (${route.origin.city})`;
-                        const destinationName = `${route.destination.code} (${route.destination.city})`;
-                        return (
-                          <option key={route.id} value={route.id}>
-                            {originName} → {destinationName}
-                          </option>
-                        );
-                      }
-                      
-                      const originAirport = airports.find(airport => airport.id === route.originId);
-                      const destinationAirport = airports.find(airport => airport.id === route.destinationId);
-                      const originName = originAirport ? originAirport.code : `ID: ${route.originId || 'N/A'}`;
-                      const destinationName = destinationAirport ? destinationAirport.code : `ID: ${route.destinationId || 'N/A'}`;
-                      return (
-                        <option key={route.id} value={route.id}>
-                          {originName} → {destinationName}
-                        </option>
-                      );
-                    })}
-                  </select>
+                    autoComplete="off"
+                  />
+                ) : field.type === 'date' ? (
+                  <DatePickerInput
+                    value={formData[field.key] ? dayjs(formData[field.key]).toDate() : null}
+                    onChange={(date) => handleMantineDateChange(date, field.key)}
+                    placeholder={`Select ${field.label}`}
+                    labelProps={{ style: { display: 'none' } }}
+                    maxDate={new Date()}
+                    valueFormat="DD/MM/YYYY"
+                    dropdownType="popover"
+                    popoverProps={{ 
+                      withinPortal: true, 
+                      position: 'bottom-start', 
+                      offset: 8, 
+                      zIndex: 1003,
+                      closeOnClickOutside: true,
+                      closeOnEscape: true
+                    }}
+                    clearable
+                    classNames={{ input: `admin-modal__input admin-modal__mantine-date ${errors[field.key] ? 'admin-modal__input--error' : ''}` }}
+                    required={field.required}
+                  />
                 ) : field.type === 'textarea' ? (
                   <textarea
                     name={field.key}
@@ -330,15 +739,14 @@ const AdminModal = ({
                         <div key={index} className="admin-modal__passenger">
                           <div className="admin-modal__passenger-header">
                             <span className="admin-modal__passenger-title">Passenger {index + 1}</span>
-                            {formData.passengers.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removePassenger(index)}
-                                className="admin-modal__passenger-remove"
-                              >
-                                ×
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => removePassenger(index)}
+                              className="admin-modal__passenger-remove"
+                              title="Remove passenger"
+                            >
+                              ×
+                            </button>
                           </div>
                           <div className="admin-modal__passenger-fields">
                             <input
@@ -350,13 +758,34 @@ const AdminModal = ({
                               className={`admin-modal__input ${errors[`passenger_${index}_name`] ? 'admin-modal__input--error' : ''}`}
                               required={field.required}
                             />
-                            <input
-                              type="date"
-                              name={`passenger_${index}_birthDate`}
-                              value={passenger.birthDate || ''}
-                              onChange={handleInputChange}
-                              placeholder="Birth Date (YYYY-MM-DD)"
-                              className={`admin-modal__input ${errors[`passenger_${index}_birthDate`] ? 'admin-modal__input--error' : ''}`}
+                            <DatePickerInput
+                              value={passenger.birthDate ? dayjs(passenger.birthDate).toDate() : null}
+                              onChange={(date) => {
+                                const value = date ? dayjs(date).format('YYYY-MM-DD') : '';
+                                setFormData(prev => ({
+                                  ...prev,
+                                  passengers: prev.passengers.map((p, i) => 
+                                    i === index 
+                                      ? { ...p, birthDate: value }
+                                      : p
+                                  )
+                                }));
+                              }}
+                              placeholder="Birth Date"
+                              labelProps={{ style: { display: 'none' } }}
+                              maxDate={new Date()}
+                              valueFormat="DD/MM/YYYY"
+                              dropdownType="popover"
+                              popoverProps={{ 
+                                withinPortal: true, 
+                                position: 'bottom-start', 
+                                offset: 8, 
+                                zIndex: 1003,
+                                closeOnClickOutside: true,
+                                closeOnEscape: true
+                              }}
+                              clearable
+                              classNames={{ input: `admin-modal__input admin-modal__mantine-date ${errors[`passenger_${index}_birthDate`] ? 'admin-modal__input--error' : ''}` }}
                               required={field.required}
                             />
                           </div>
@@ -371,16 +800,23 @@ const AdminModal = ({
                     </button>
                   </div>
                 ) : (
-                  <input
-                    type={field.type}
-                    name={field.key}
-                    value={formData[field.key] || ''}
-                    onChange={handleInputChange}
-                    className={`admin-modal__input ${errors[field.key] ? 'admin-modal__input--error' : ''}`}
-                    required={field.required}
-                    maxLength={field.maxLength}
-                    step={field.step}
-                  />
+                  <div>
+                    <input
+                      type={field.type}
+                      name={field.key}
+                      value={formData[field.key] || ''}
+                      onChange={handleInputChange}
+                      className={`admin-modal__input ${errors[field.key] ? 'admin-modal__input--error' : ''}`}
+                      required={field.required}
+                      maxLength={field.maxLength}
+                      step={field.step}
+                    />
+                    {field.key === 'availableSeats' && entity === 'flights' && formData.aircraftId && (
+                      <div className="admin-modal__capacity-hint">
+                        Aircraft capacity: {getAircraftCapacity(formData.aircraftId)} seats
+                      </div>
+                    )}
+                  </div>
                 )}
                 
                 {errors[field.key] && (
