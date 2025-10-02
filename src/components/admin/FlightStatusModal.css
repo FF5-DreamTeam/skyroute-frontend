@@ -1,0 +1,233 @@
+.flight-status-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.flight-status-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.flight-status-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.flight-status-modal__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.flight-status-modal__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.flight-status-modal__close:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.flight-status-modal__content {
+  padding: 0 24px 24px 24px;
+}
+
+.flight-status-modal__info {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.flight-status-modal__info p {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 14px;
+}
+
+.flight-status-modal__info p:last-child {
+  margin-bottom: 0;
+}
+
+.flight-status-modal__current-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+.flight-status-modal__current-status--available {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.flight-status-modal__current-status--unavailable {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.flight-status-modal__options h4 {
+  margin: 0 0 16px 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.flight-status-modal__status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.flight-status-modal__status-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.flight-status-modal__status-card:hover {
+  border-color: #3b82f6;
+  background-color: #f8fafc;
+}
+
+.flight-status-modal__status-card--active {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.flight-status-modal__status-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.flight-status-modal__status-content {
+  flex: 1;
+}
+
+.flight-status-modal__status-value {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.flight-status-modal__status-description {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.flight-status-modal__actions {
+  display: flex;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+}
+
+.flight-status-modal__btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  min-width: 100px;
+}
+
+.flight-status-modal__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flight-status-modal__btn--cancel {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.flight-status-modal__btn--cancel:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.flight-status-modal__btn--confirm {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.flight-status-modal__btn--confirm:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .flight-status-modal {
+    margin: 20px;
+    max-width: none;
+  }
+
+  .flight-status-modal__status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flight-status-modal__actions {
+    flex-direction: column;
+  }
+
+  .flight-status-modal__btn {
+    width: 100%;
+  }
+}
