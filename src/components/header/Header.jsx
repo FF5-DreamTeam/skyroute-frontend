@@ -53,6 +53,27 @@ const Header = () => {
                   LOG IN
                 </Link>
               </>
+            ) : isAdmin ? (
+              <>
+                <Link 
+                  to="/profile" 
+                  className="header__nav-link"
+                >
+                  ADMIN PROFILE
+                </Link>
+                <Link 
+                  to="/admin" 
+                  className="header__nav-link"
+                >
+                  DASHBOARD
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="header__nav-link header__nav-link--button"
+                >
+                  LOGOUT
+                </button>
+              </>
             ) : (
               <>
                 <Link 
@@ -73,14 +94,6 @@ const Header = () => {
                 >
                   HISTORY
                 </Link>
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className="header__nav-link"
-                  >
-                    ADMIN
-                  </Link>
-                )}
                 <button 
                   onClick={handleLogout}
                   className="header__nav-link header__nav-link--button"
@@ -133,6 +146,29 @@ const Header = () => {
                     LOG IN
                   </Link>
                 </>
+              ) : isAdmin ? (
+                <>
+                  <Link 
+                    to="/profile" 
+                    className="header__mobile-nav-link"
+                    onClick={closeMobileMenu}
+                  >
+                    ADMIN PROFILE
+                  </Link>
+                  <Link 
+                    to="/admin" 
+                    className="header__mobile-nav-link"
+                    onClick={closeMobileMenu}
+                  >
+                    DASHBOARD
+                  </Link>
+                  <button 
+                    onClick={handleLogout}
+                    className="header__mobile-nav-link header__mobile-nav-link--button"
+                  >
+                    LOGOUT
+                  </button>
+                </>
               ) : (
                 <>
                   <Link 
@@ -156,15 +192,6 @@ const Header = () => {
                   >
                     HISTORY
                   </Link>
-                  {isAdmin && (
-                    <Link 
-                      to="/admin" 
-                      className="header__mobile-nav-link"
-                      onClick={closeMobileMenu}
-                    >
-                      ADMIN
-                    </Link>
-                  )}
                   <button 
                     onClick={handleLogout}
                     className="header__mobile-nav-link header__mobile-nav-link--button"

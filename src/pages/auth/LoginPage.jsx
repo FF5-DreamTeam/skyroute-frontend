@@ -82,10 +82,20 @@ const LoginPage = () => {
             localStorage.setItem('user', JSON.stringify(userData));
           }
         }
+        const userData = JSON.parse(localStorage.getItem('user'));
+        const isAdmin = userData?.role === 'ADMIN';
+        
         const params = new URLSearchParams(location.search);
         const redirect = params.get('redirect');
         toast.success('Login successful!');
-        navigate(redirect || '/profile');
+        
+        if (redirect) {
+          navigate(redirect);
+        } else if (isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/profile');
+        }
       } else {
         toast.error(data.message || 'Login failed');
       }
