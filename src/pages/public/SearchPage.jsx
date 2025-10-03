@@ -69,9 +69,18 @@ const SearchPage = () => {
       try {
         setLoading(true);
         setError(null);
+        
 
-        if (budget || city || origin) {
-          const queryParams = { page, size: 10 };
+        if ((budget || city || origin) && !destination && !departureDate) {
+          const queryParams = { 
+            page, 
+            size: 10,
+            pageable: JSON.stringify({
+              page: page,
+              size: 10,
+              sort: []
+            })
+          };
           if (budget) queryParams.budget = Number(budget);
           if (city) queryParams.destination = city.trim();
           if (origin) queryParams.origin = origin.trim();
@@ -102,11 +111,16 @@ const SearchPage = () => {
           return `${dd}/${mm}/${yyyy}`;
         };
 
+        const normalizedOrigin = normalizeCode(origin);
+        const normalizedDestination = normalizeCode(destination);
+        const formattedDepartureDate = formatDateForBackend(departureDate);
+        const formattedReturnDate = returnDate ? formatDateForBackend(returnDate) : undefined;
+        
         const query = buildQueryString({
-          origin: normalizeCode(origin),
-          destination: normalizeCode(destination),
-          departureDate: formatDateForBackend(departureDate),
-          returnDate: returnDate ? formatDateForBackend(returnDate) : undefined,
+          origin: normalizedOrigin,
+          destination: normalizedDestination,
+          departureDate: formattedDepartureDate,
+          returnDate: formattedReturnDate,
           passengers: params.get('passengers') || undefined
         });
         const res = await fetch(`${API_ENDPOINTS.FLIGHTS.PUBLIC.SEARCH}?${query}`);

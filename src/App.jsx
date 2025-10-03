@@ -28,12 +28,6 @@ import HistoryPage from './pages/user/HistoryPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AirportsPage from './pages/admin/AirportsPage';
-import AircraftsPage from './pages/admin/AircraftsPage';
-import RoutesPage from './pages/admin/RoutesPage';
-import FlightsPage from './pages/admin/FlightsPage';
-import AdminBookingsPage from './pages/admin/BookingsPage';
-import UsersPage from './pages/admin/UsersPage';
 
 function App() {
   return (
@@ -131,36 +125,6 @@ function App() {
         <Route path="/admin" element={
           <AdminLayout>
             <AdminDashboard />
-          </AdminLayout>
-        } />
-        <Route path="/admin/airports" element={
-          <AdminLayout>
-            <AirportsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/aircrafts" element={
-          <AdminLayout>
-            <AircraftsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/routes" element={
-          <AdminLayout>
-            <RoutesPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/flights" element={
-          <AdminLayout>
-            <FlightsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/bookings" element={
-          <AdminLayout>
-            <AdminBookingsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/users" element={
-          <AdminLayout>
-            <UsersPage />
           </AdminLayout>
         } />
           </Routes>
