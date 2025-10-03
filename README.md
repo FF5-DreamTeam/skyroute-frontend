@@ -186,7 +186,7 @@ src/
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/FF5-DreamTeam/skyroute-frontend.git
    cd skyroute-front
    ```
 
