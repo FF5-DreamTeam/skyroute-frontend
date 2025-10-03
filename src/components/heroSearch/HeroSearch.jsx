@@ -104,7 +104,12 @@ const HeroSearch = () => {
           { id: 7, city: 'Rome', code: 'FCO', name: 'Leonardo da Vinci International Airport' },
           { id: 8, city: 'Vienna', code: 'VIE', name: 'Vienna International Airport' },
           { id: 9, city: 'Prague', code: 'PRG', name: 'Václav Havel Airport Prague' },
-          { id: 10, city: 'Warsaw', code: 'WAW', name: 'Warsaw Chopin Airport' }
+          { id: 10, city: 'Warsaw', code: 'WAW', name: 'Warsaw Chopin Airport' },
+          { id: 11, city: 'New York', code: 'JFK', name: 'John F. Kennedy International Airport' },
+          { id: 12, city: 'Los Angeles', code: 'LAX', name: 'Los Angeles International Airport' },
+          { id: 13, city: 'Chicago', code: 'ORD', name: 'O\'Hare International Airport' },
+          { id: 14, city: 'Miami', code: 'MIA', name: 'Miami International Airport' },
+          { id: 15, city: 'San Francisco', code: 'SFO', name: 'San Francisco International Airport' }
         ];
         setAirports(fallbackAirports);
         setFilteredFromAirports(fallbackAirports);
@@ -381,16 +386,24 @@ const HeroSearch = () => {
                   e.preventDefault();
                   const budgetNum = extraBudget ? Number(extraBudget) : null;
                   const search = new URLSearchParams();
+                  
+                  
                   if (budgetNum !== null && !Number.isNaN(budgetNum)) {
                     search.append('budget', String(budgetNum));
                   }
                   if (extraCity && extraCity.trim()) {
-                    search.append('city', extraCity.trim());
+                    const match = extraCity.match(/\(([A-Z]{3})\)/);
+                    const cityCode = match ? match[1] : extraCity.trim();
+                    search.append('city', cityCode);
                   }
                   if (extraOrigin && extraOrigin.trim()) {
-                    search.append('origin', extraOrigin.trim());
+                    const match = extraOrigin.match(/\(([A-Z]{3})\)/);
+                    const originCode = match ? match[1] : extraOrigin.trim();
+                    search.append('origin', originCode);
                   }
-                  navigate(`/search?${search.toString()}`);
+                  
+                  const searchString = search.toString();
+                  navigate(`/search?${searchString}`);
                 }}
               >
                 <div className="hero-search__extra-row">
