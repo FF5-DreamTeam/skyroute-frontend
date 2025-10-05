@@ -366,6 +366,25 @@ export const adminApi = {
       }
     },
     
+    filterAdmin: async (bookingStatus = null, page = 0, size = 25) => {
+      try {
+        let url = `${API_BASE}/bookings/filter/admin?page=${page}&size=${size}`;
+        if (bookingStatus && bookingStatus !== 'all') {
+          url += `&bookingStatus=${bookingStatus.toUpperCase()}`;
+        }
+        const response = await fetch(url, {
+          headers: getAuthHeaders()
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch bookings');
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        return { content: [], totalPages: 0, totalElements: 0, number: 0, size: 25 };
+      }
+    },
+    
     
     
     create: async (bookingData) => {

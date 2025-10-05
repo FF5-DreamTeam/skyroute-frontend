@@ -17,7 +17,9 @@ const DataTable = ({
   onSearchInputChange,
   onSearchSubmit,
   onClearSearch,
-  isSearching
+  isSearching,
+  statusFilter,
+  onStatusFilterChange
 }) => {
   const [pageInput, setPageInput] = useState('');
 
@@ -126,6 +128,18 @@ const DataTable = ({
               </button>
             )}
           </form>
+          {entity === 'bookings' && onStatusFilterChange && (
+            <select
+              value={statusFilter || 'all'}
+              onChange={onStatusFilterChange}
+              className="data-table__status-filter"
+            >
+              <option value="all">📋 All Status</option>
+              <option value="created">🆕 Created</option>
+              <option value="confirmed">✅ Confirmed</option>
+              <option value="cancelled">❌ Cancelled</option>
+            </select>
+          )}
           <button 
             className="data-table__add-btn"
             onClick={onAdd}
