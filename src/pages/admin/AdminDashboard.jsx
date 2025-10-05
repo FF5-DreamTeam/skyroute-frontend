@@ -33,6 +33,7 @@ const AdminDashboard = () => {
   const [flightStatusLoading, setFlightStatusLoading] = useState(false);
   const [searchId, setSearchId] = useState('');
   const [searchResults, setSearchResults] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const tabs = [
     { id: 'users', label: 'Users', icon: '👥' },
@@ -131,7 +132,7 @@ const AdminDashboard = () => {
           };
           break;
         case 'bookings':
-          response = await adminApi.bookings.getAll(page, 25);
+          response = await adminApi.bookings.filterAdmin(statusFilter, page, 25);
           break;
         default:
           response = { content: [], totalPages: 0, totalElements: 0, number: 0, size: 25 };
@@ -288,11 +289,11 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, airports, aircrafts, routes]);
+  }, [activeTab, airports, aircrafts, routes, statusFilter]);
 
   useEffect(() => {
     fetchData(currentPage);
-  }, [activeTab, currentPage, fetchData]);
+  }, [activeTab, currentPage, fetchData, statusFilter]);
 
   useEffect(() => {
     if ((activeTab === 'routes' && airports.length > 0) ||
@@ -822,6 +823,13 @@ const AdminDashboard = () => {
             
             return processedBooking;
           });
+          
+          // Apply status filter for bookings in search results
+          if (statusFilter !== 'all') {
+            processedData = processedData.filter(booking => 
+              booking.bookingStatus?.toUpperCase() === statusFilter.toUpperCase()
+            );
+          }
         }
         
         setSearchResults(processedData);
@@ -863,6 +871,11 @@ const AdminDashboard = () => {
     fetchData(currentPage);
   };
 
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setCurrentPage(0); // Reset to first page when filter changes
+  };
+
   const renderTabContent = () => {
     return (
       <DataTable
@@ -882,6 +895,8 @@ const AdminDashboard = () => {
         onSearchSubmit={handleSearchSubmit}
         onClearSearch={clearSearch}
         isSearching={searchResults !== null}
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
       />
     );
   };
