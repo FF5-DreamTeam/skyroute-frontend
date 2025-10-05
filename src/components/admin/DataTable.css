@@ -33,8 +33,9 @@
 .data-table__actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: nowrap;
 }
 
 .data-table__search-form {
@@ -227,13 +228,6 @@
   border-radius: 0.25rem;
   border: 1px solid var(--color-background-3);
   margin: 0 auto;
-}
-
-.data-table__actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
 }
 
 .data-table__action {
@@ -468,8 +462,9 @@
   }
 
   .data-table__actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.25rem;
+    justify-content: center;
   }
 
   .data-table__action {

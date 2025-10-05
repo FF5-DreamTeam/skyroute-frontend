@@ -144,7 +144,7 @@ const SearchPage = () => {
 
   useEffect(() => {
     const fetchAlternativeFlights = async () => {
-        if (!origin || !destination || !departureDate || results.length > 0) {
+        if (!origin || !destination || !departureDate || budget || city) {
           setAlternativeFlights([]);
           return;
         }
@@ -247,11 +247,11 @@ const SearchPage = () => {
     };
 
     fetchAlternativeFlights();
-  }, [origin, destination, departureDate, passengers, results.length]);
+  }, [origin, destination, departureDate, passengers, results.length, budget, city]);
 
   useEffect(() => {
     const fetchAlternativeReturnFlights = async () => {
-      if (!origin || !destination || !returnDate || !departureDate || results.length > 0) {
+      if (!origin || !destination || !returnDate || !departureDate || budget || city) {
         setAlternativeReturnFlights([]);
         return;
       }
@@ -353,7 +353,7 @@ const SearchPage = () => {
     };
 
     fetchAlternativeReturnFlights();
-  }, [origin, destination, returnDate, departureDate, passengers, results.length]);
+  }, [origin, destination, returnDate, departureDate, passengers, results.length, budget, city]);
 
   useEffect(() => {
     const fetchReturnFlights = async () => {
@@ -754,7 +754,7 @@ const SearchPage = () => {
           </div>
         )}
 
-        {!loading && !error && results.length === 0 && !returnDate && (
+        {!loading && !error && !returnDate && !budget && !city && origin && destination && departureDate && (
           <div className="alternative-flights-section">
             <h3 className="alternative-flights-title">
               Available flights on alternative dates:
@@ -824,7 +824,7 @@ const SearchPage = () => {
           </div>
         )}
 
-        {!loading && !error && results.length === 0 && returnDate && (
+        {!loading && !error && returnDate && !budget && !city && origin && destination && departureDate && (
           <div className="alternative-round-trip-section">
             <h3 className="alternative-round-trip-title">
               Available round-trip combinations on alternative dates:
