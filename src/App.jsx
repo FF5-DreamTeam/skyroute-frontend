@@ -1,5 +1,9 @@
 import React from 'react';
+import { MantineProvider } from '@mantine/core';
+import { DatesProvider } from '@mantine/dates';
+import { Toaster } from 'sonner';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import 'dayjs/locale/en';
 
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
@@ -24,17 +28,38 @@ import HistoryPage from './pages/user/HistoryPage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
-import AirportsPage from './pages/admin/AirportsPage';
-import AircraftsPage from './pages/admin/AircraftsPage';
-import RoutesPage from './pages/admin/RoutesPage';
-import FlightsPage from './pages/admin/FlightsPage';
-import AdminBookingsPage from './pages/admin/BookingsPage';
-import UsersPage from './pages/admin/UsersPage';
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <MantineProvider theme={{
+      fontFamily: 'Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+      primaryColor: 'teal',
+      defaultRadius: 'md',
+      colors: {
+        teal: [
+          '#e6fcf5','#c3fae8','#96f2d7','#63e6be','#38d9a9','#20c997','#12b886','#0ca678','#099268','#087f5b'
+        ]
+      }
+    }}
+    withGlobalStyles withNormalizeCSS>
+      <DatesProvider settings={{ locale: 'en', firstDayOfWeek: 0 }}>
+        <Router basename={process.env.PUBLIC_URL} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <Toaster 
+            position="top-right" 
+            theme="light"
+            toastOptions={{
+              style: {
+                background: 'var(--color-background)',
+                border: '1px solid var(--color-background-2)',
+                borderRadius: 'var(--radius-lg)',
+                color: 'var(--color-text)',
+                fontFamily: 'var(--font-body)',
+                boxShadow: 'var(--shadow-lg)'
+              },
+              className: 'custom-toast'
+            }}
+          />
+          <Routes>
         {/* Public Routes */}
         <Route path="/" element={
           <PublicLayout>
@@ -68,6 +93,11 @@ function App() {
             <ForgotPasswordPage />
           </PublicLayout>
         } />
+        <Route path="/reset-password" element={
+          <PublicLayout>
+            <ForgotPasswordPage />
+          </PublicLayout>
+        } />
 
         {/* User Routes */}
         <Route path="/profile" element={
@@ -80,7 +110,7 @@ function App() {
             <BookingsPage />
           </UserLayout>
         } />
-        <Route path="/booking/:id" element={
+        <Route path="/booking-details/:bookingId" element={
           <UserLayout>
             <BookingDetailsPage />
           </UserLayout>
@@ -97,38 +127,10 @@ function App() {
             <AdminDashboard />
           </AdminLayout>
         } />
-        <Route path="/admin/airports" element={
-          <AdminLayout>
-            <AirportsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/aircrafts" element={
-          <AdminLayout>
-            <AircraftsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/routes" element={
-          <AdminLayout>
-            <RoutesPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/flights" element={
-          <AdminLayout>
-            <FlightsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/bookings" element={
-          <AdminLayout>
-            <AdminBookingsPage />
-          </AdminLayout>
-        } />
-        <Route path="/admin/users" element={
-          <AdminLayout>
-            <UsersPage />
-          </AdminLayout>
-        } />
-      </Routes>
-    </Router>
+          </Routes>
+        </Router>
+      </DatesProvider>
+    </MantineProvider>
   );
 }
 

@@ -1,0 +1,77 @@
+:root {
+  --color-main: #bbd8d8;
+  --color-background: #fff;
+  --color-text: #000;
+  --color-accent-1: #798686;
+  --color-accent-2: #5d5d5d;
+  --color-background-2: #f8f9fa;
+  --color-background-3: #e9ecef;
+  --color-accent-3: #f7a34f;
+  --color-text-2: #2d3748;
+  --color-main-light: #d4e8e8;
+  --color-main-dark: #a8c8c8;
+  --color-accent-1-light: #8a9a9a;
+  --color-accent-1-dark: #6b7575;
+  --color-primary: var(--color-main);
+  --color-primary-dark: var(--color-main-dark);
+  --color-secondary: var(--color-accent-1);
+  --color-success: #10b981;
+  --color-warning: var(--color-accent-3);
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%),
+    0 4px 6px -4px rgb(0 0 0 / 10%);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --font-display: "Roboto", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-heading: "Roboto", sans-serif;
+
+  /* Responsive Typography Scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --text-base: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3rem);
+  --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 3.75rem);
+  --text-6xl: clamp(3.75rem, 3rem + 3.75vw, 4.5rem);
+
+  /* Responsive Spacing Scale */
+  --space-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+  --space-sm: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
+  --space-md: clamp(1rem, 0.8rem + 1vw, 1.5rem);
+  --space-lg: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+  --space-xl: clamp(2rem, 1.6rem + 2vw, 3rem);
+  --space-2xl: clamp(3rem, 2.4rem + 3vw, 4rem);
+  --space-3xl: clamp(4rem, 3.2rem + 4vw, 6rem);
+
+  /* Responsive Container Widths */
+  --container-xs: 100%;
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1400px;
+
+  /* Responsive Breakpoints */
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  --breakpoint-3xl: 1920px;
+}

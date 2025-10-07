@@ -1,0 +1,641 @@
+/* SearchPage.css */
+
+.search-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.search-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.loading-message {
+  color: #6b7280;
+}
+
+.error-message {
+  color: #dc2626;
+}
+
+.no-results-container {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.no-results-text {
+  color: #6b7280;
+}
+
+.alternative-loading {
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+/* Results section */
+.results-section {
+  margin-top: 2rem;
+}
+
+.results-section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+/* Round-trip combinations */
+.round-trip-combinations {
+  margin-top: 1rem;
+}
+
+.combinations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.round-trip-card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -1px rgb(0 0 0 / 6%);
+  padding: 1.5rem;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s;
+}
+
+.round-trip-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%),
+    0 4px 6px -2px rgb(0 0 0 / 5%);
+}
+
+.round-trip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.round-trip-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.round-trip-total-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.round-trip-flights {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.flight-leg {
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.flight-leg-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.flight-leg-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.round-trip-actions {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.book-round-trip-button {
+  background-color: #059669;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  text-align: center;
+  min-width: 200px;
+}
+
+.book-round-trip-button:hover {
+  background-color: #047857;
+}
+
+/* Main results list */
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.flight-card {
+  display: block;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.flight-card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -1px rgb(0 0 0 / 6%);
+}
+
+.flight-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.flight-number {
+  font-weight: 600;
+  color: #111827;
+}
+
+.flight-route {
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.flight-datetime {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.flight-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.pagination-button {
+  padding: 0.25rem 0.75rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+.pagination-info {
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+/* Alternative flights section */
+.alternative-flights-section {
+  margin-top: 2rem;
+}
+
+.alternative-flights-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.alternative-dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.alternative-date-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 1rem;
+}
+
+.alternative-date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.alternative-date-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.alternative-date-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.alternative-flights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.alternative-flight-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.alternative-flight-item:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -1px rgb(0 0 0 / 6%);
+}
+
+.alternative-flight-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alternative-flight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.alternative-flight-number {
+  font-weight: 600;
+  color: #111827;
+}
+
+.alternative-flight-route {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.alternative-flight-datetime {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.alternative-flight-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alternative-flight-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.alternative-flight-price {
+  color: #059669;
+  font-weight: 600;
+}
+
+.view-details-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.view-details-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Return flights section */
+.return-flights-section {
+  margin-top: 2rem;
+}
+
+.return-flights-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.return-loading {
+  color: #6b7280;
+}
+
+.return-date-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 1rem;
+}
+
+.return-date-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.return-date-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.return-date-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.return-flights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.return-flight-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.return-flight-item:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -1px rgb(0 0 0 / 6%);
+}
+
+.return-flight-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.return-flight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.return-flight-number {
+  font-weight: 600;
+  color: #111827;
+}
+
+.return-flight-route {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.return-flight-datetime {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.return-flight-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.return-flight-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.return-flight-price {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Responsive design */
+@media (width <= 768px) {
+  .search-container {
+    padding: 1rem 0.5rem;
+  }
+
+  .flight-card-content,
+  .alternative-flight-content,
+  .return-flight-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .alternative-flight-details {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .pagination {
+    justify-content: center;
+  }
+}
+
+/* Alternative round-trip combinations section */
+.alternative-round-trip-section {
+  margin-top: 2rem;
+}
+
+.alternative-round-trip-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.alternative-round-trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alternative-round-trip-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.alternative-round-trip-header {
+  background: #f3f4f6;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alternative-round-trip-header h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.alternative-round-trip-total-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.alternative-round-trip-flights {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alternative-flight-leg {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.alternative-flight-leg-label {
+  background: #f9fafb;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.alternative-flight-leg-content {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alternative-flight-info {
+  flex: 1;
+}
+
+.alternative-flight-number {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.alternative-flight-route {
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.alternative-flight-datetime {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.alternative-flight-date-offset {
+  color: #059669;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: #d1fae5;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  display: inline-block;
+}
+
+.alternative-flight-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.alternative-round-trip-actions {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.book-alternative-round-trip-button {
+  display: inline-block;
+  background: #059669;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  width: 100%;
+  text-align: center;
+}
+
+.book-alternative-round-trip-button:hover {
+  background: #047857;
+}
+
+@media (width <= 768px) {
+  .alternative-round-trip-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .alternative-flight-leg-content {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .alternative-flight-price {
+    font-size: 1.125rem;
+  }
+}

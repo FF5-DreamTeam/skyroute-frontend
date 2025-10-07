@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404</title>
+    <meta http-equiv="refresh" content="0; url=/skyroute-frontend/" />
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+  <script>
+    (function () {
+      var redirectPath = "/skyroute-frontend/";
+      var path = window.location.pathname;
+      var repoBase = "/skyroute-frontend";
+      if (path.startsWith(repoBase)) {
+        var rest = path.slice(repoBase.length);
+        if (!rest || rest === "/") {
+          window.location.replace(redirectPath);
+          return;
+        }
+        var newUrl =
+          redirectPath +
+          "#" +
+          rest +
+          window.location.search +
+          window.location.hash;
+        window.location.replace(newUrl);
+      } else {
+        window.location.replace(redirectPath);
+      }
+    })();
+  </script>
+</html>
