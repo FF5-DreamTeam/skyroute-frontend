@@ -2,7 +2,7 @@
   "name": "skyroute-front",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://skyroot.space",
+  "homepage": "https://skyroute.space",
   "dependencies": {
     "@mantine/core": "8.3.2",
     "@mantine/dates": "8.3.2",
