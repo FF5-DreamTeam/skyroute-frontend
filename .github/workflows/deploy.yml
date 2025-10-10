@@ -25,6 +25,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Add CNAME file to build
+        run: echo "skyroute.space" > build/CNAME
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./build
